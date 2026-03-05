@@ -110,21 +110,6 @@ Pemilihan pattern disesuaikan dengan kebutuhan sistem akademik yang memiliki alu
 
 ---
 
-## 🛠 Teknologi yang Digunakan
-
-### Back-end
-- Python  
-- Django  
-- Django REST Framework  
-
-### Front-end
-- React.js  
-
-### Database
-- PostgreSQL  
-
----
-
 ## 📊 Manfaat Implementasi
 
 - Mengurangi proses administrasi manual  
