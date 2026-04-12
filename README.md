@@ -124,7 +124,8 @@ Pemilihan pattern disesuaikan dengan kebutuhan sistem akademik yang memiliki alu
 
 - Joshua Subianto  
 - Josephine Alvina Luwia  
-- Jayden Marvel Ethanael  
+- Jessica Alvina Luwia
+- Nathaniel Valentino Robert  
 
 ---
 
