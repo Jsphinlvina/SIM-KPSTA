@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4242374b-66c4-4d3f-917f-11ad4a9824d0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/archive/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/archive/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/archive/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/archive/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/archive/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/archive/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/archive/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/document/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/document/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/document/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/document/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/document/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/document/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/document/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/patterns/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/patterns/notification_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/patterns/notification_subject.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/patterns/observers/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/patterns/observers/notification_observer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/notification/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/patterns/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/patterns/availability_detector.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/services/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/services/availability_service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/asgi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/wsgi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/exceptions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/pagination.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/permissions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/responses.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manage.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="3Dhg6u8PXgsPiDx6z8D9WVg8uxd" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Week-1-2272002-Joshua-Subianto&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Joshua Subianto/OneDrive/ドキュメント/GitHub/SIM-KPSTA&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Joshua Subianto\OneDrive\ドキュメント\GitHub\SIM-KPSTA" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-2653e85de345-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.31033.139" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4242374b-66c4-4d3f-917f-11ad4a9824d0" name="Changes" comment="" />
+      <created>1778739549884</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1778739549884</updated>
+    </task>
+    <servers />
+  </component>
+</project>
