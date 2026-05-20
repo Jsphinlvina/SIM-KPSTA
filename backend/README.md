@@ -1,6 +1,6 @@
 # Progress Report - SIM-KPSTA Backend
 
-## Minggu 1: Fitur 1 (Autentikasi & Hak Akses)
+## Minggu 2: Fitur 1 (Autentikasi & Hak Akses)
 ### 1. Database & Migrasi (PostgreSQL)
 * **Status:** Berhasil terhubung via `.env` dan sinkronisasi skema bersih.
 * **Hasil:** Model kustom `Users` berhasil di-migrate ke database fisik PostgreSQL tanpa conflict history.
