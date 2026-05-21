@@ -1,29 +1,34 @@
-# Progress Report - SIM-KPSTA Backend
+# Progress Report - SIM-KPSTA Fullstack Development
 
-## Minggu 2: Fitur 1 (Autentikasi & Hak Akses)
-### 1. Database & Migrasi (PostgreSQL)
-* **Status:** Berhasil terhubung via `.env` dan sinkronisasi skema bersih.
-* **Hasil:** Model kustom `Users` berhasil di-migrate ke database fisik PostgreSQL tanpa conflict history.
+## 📚 Minggu 3: Fitur 2 (Penawaran Topik oleh Dosen)
 
-### 2. Implementasi Komponen Komplet (Layered Architecture)
-* **Model (`apps/authentication/models.py`):** Mengimplementasikan kustom `Users` model dengan atribut `user_id`, `nim_nip`, `nama_lengkap`, `email`, dan `role` (mahasiswa, dosen, koordinator, kaprodi, admin).
-* **Admin Visual (`apps/authentication/admin.py`):** Mendaftarkan `CustomUserAdmin` agar model pengguna dapat dikelola penuh secara visual via Django Admin Panel.
-* **Pattern (`apps/authentication/patterns/auth_session.py`):** Menggunakan **Singleton Pattern** untuk manajemen konsistensi state sesi pengguna lokal backend.
-* **Permissions (`core/permissions.py`):** Mengimplementasikan *Role-Based Access Control* (RBAC) via `IsMahasiswa`, `IsDosen`, `IsKoordinator`, `IsKaprodi`, dan `IsAdmin`.
-* **Services Layer (`apps/authentication/services/`):** * `auth_service.py` untuk logika bisnis autentikasi murni (enkripsi sandi & integrasi *Simple JWT*).
-  * `user_service.py` untuk manajemen data pengguna (CRUD oleh Admin).
-* **Serializers (`apps/authentication/serializers.py`):** Validasi data input kredensial masuk (`LoginSerializer`) dan penanganan format data profil pengguna (`UserSerializer`).
-* **Views/Controller (`apps/authentication/views.py`):** Endpoint kontroler komplit (`login`, `logout`, `me`, `register`, `list-users`, `manage_user`) terintegrasi dengan utilitas standard response proyek (`ok` & `fail`).
+Kami telah berhasil mengimplementasikan sistem penawaran topik proyek KP/STA oleh dosen dengan mengadopsi arsitektur berlapis murni yang dipadukan dengan desain pola perilaku (*Behavioral Design Pattern*).
 
-### 3. Konfigurasi Sistem (`config/settings.py` & `urls.py`)
-* Mengonfigurasi `AUTH_USER_MODEL = 'authentication.Users'`.
-* Menambahkan custom payload `USER_ID_FIELD: 'user_id'` pada arsitektur paket `SIMPLE_JWT` agar selaras dengan primary key model kustom.
-* Mendaftarkan routing API global pada endpoint `/api/v1/auth/`, `/api/v1/auth/refresh/`, dan `/api/v1/users/`.
+### 1. Sinkronisasi Skema Database Baru (PostgreSQL)
+Aplikasi baru bernama `topik` telah didaftarkan pada sistem dengan dua struktur tabel utama:
+* **`PeriodeSemester` (`periode_semester`)**: Mengelola data periode akademik. Aturan bisnis mengunci agar hanya boleh ada **satu** periode yang berstatus `'aktif'` dalam satu waktu.
+* **`Topik` (`topik`)**: Menyimpan data penawaran topik yang dibuat oleh user ber-role `dosen`, berelasi ke tabel `Users` dan `PeriodeSemester`.
 
-### 4. Hasil Pengujian Otomatis (Unit Testing)
+### 2. Implementasi Desain Pola: Template Method Pattern
+Untuk menstandardisasi alur bisnis pembuatan topik agar seragam, aman, dan mematuhi prinsip *Open/Closed Principle*, alur kerja diisolasi ke dalam folder `apps/topik/patterns/`:
+* **`AbstractTopikPenawaran`**: Kelas abstrak yang mengunci *skeleton* (kerangka) algoritma utama melalui metode `proses_penawaran()`.
+* **`TopikPenawaranDosen`**: Implementasi konkrit yang mendefinisikan langkah validasi keunikan judul (`validate_topik`), penguncian otomatis ke periode akademik yang aktif (`assign_periode`), dan penyimpanan ke database via ORM.
+* **Hook Method (`notify_mahasiswa`)**: Menyediakan gerbang (*skeleton gateway*) untuk diintegrasikan dengan `NotifikasiService` di masa mendatang.
+
+### 3. Pemisahan Layer Bisnis & Controller API
+* **`TopikService` & `PeriodeService`**: Bertindak sebagai *Service Layer* yang memisahkan logika bisnis internal dari fungsionalitas HTTP request/response (SRP).
+* **`TopikViewSet` & `PeriodeSemesterViewSet`**: Controller API yang mengembalikan format respons terstandardisasi (`ok` dan `fail`) serta menerapkan proteksi RBAC (Hanya `dosen` yang bisa *create* topik, hanya `admin` yang bisa *create* periode).
+
+### 4. Gerbang REST API Endpoints yang Terbentuk
+* `POST /api/v1/topik/` $\rightarrow$ Membuat penawaran topik baru (Khusus Dosen).
+* `GET /api/v1/topik/` $\rightarrow$ Menampilkan seluruh daftar topik.
+* `GET /api/v1/topik/available/` $\rightarrow$ Menampilkan rincian topik yang kuotanya masih tersedia.
+* `GET /api/v1/periode-semester/active/` $\rightarrow$ Mengambil data periode akademik yang sedang berjalan.
+
+### 5. Hasil Pengujian Otomatis (Automated Unit Testing)
 * **Status:** **PASSED (OK)**
-* **Command:** `python manage.py test apps.authentication`
-* **Cakupan Tes (4 Skenario Berhasil):**
-  * `test_models.py`: Validasi keberhasilan pembuatan user dan kecocokan enkripsi password hash di level ORM.
-  * `test_views.py`: Validasi hit HTTP POST ke endpoint API Login dan memastikan token akses JWT digenerate dengan benar.
-  * `test_auth_session.py`: Membuktikan keandalan *Singleton Pattern* (kesamaan identitas objek memori) serta mekanisme set/clear session pengguna.
+* **Command:** `python manage.py test apps.topik.tests -t .`
+* **Skenario Tes yang Berhasil Dilalui (3/3 Skenario):**
+    1.  `test_proses_penawaran_sukses`: Membuktikan skrip sanggup menyimpan data dengan benar dan otomatis mengikat ke rute periode aktif.
+    2.  `test_proses_penawaran_gagal_kuota_negatif`: Memastikan sistem mendeteksi dan menolak input kuota berangka minus atau `0`.
+    3.  `test_proses_penawaran_gagal_judul_duplikat`: Membuktikan keandalan sistem dalam memblokir dosen yang mencoba mendaftarkan judul topik yang sama agar tidak terjadi redundansi data.

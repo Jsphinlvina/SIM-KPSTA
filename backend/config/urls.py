@@ -10,6 +10,6 @@ api_v1 = [
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/', include(api_v1)),
-    path('api/', include('apps.authentication.urls')),
+    path('api/v1/auth/', include('apps.authentication.urls')),
+    path('api/v1/', include('apps.topik.urls')),
 ]
