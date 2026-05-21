@@ -2,10 +2,9 @@
 
 ## 📚 Minggu 3: Fitur 2 (Penawaran Topik oleh Dosen)
 
-Kami telah berhasil mengimplementasikan sistem penawaran topik proyek KP/STA oleh dosen dengan mengadopsi arsitektur berlapis murni yang dipadukan dengan desain pola perilaku (*Behavioral Design Pattern*).
+Mengimplementasikan sistem penawaran topik proyek KP/STA oleh dosen dengan mengadopsi arsitektur berlapis murni yang dipadukan dengan desain pola perilaku (*Behavioral Design Pattern*).
 
 ### 1. Sinkronisasi Skema Database Baru (PostgreSQL)
-Aplikasi baru bernama `topik` telah didaftarkan pada sistem dengan dua struktur tabel utama:
 * **`PeriodeSemester` (`periode_semester`)**: Mengelola data periode akademik. Aturan bisnis mengunci agar hanya boleh ada **satu** periode yang berstatus `'aktif'` dalam satu waktu.
 * **`Topik` (`topik`)**: Menyimpan data penawaran topik yang dibuat oleh user ber-role `dosen`, berelasi ke tabel `Users` dan `PeriodeSemester`.
 
