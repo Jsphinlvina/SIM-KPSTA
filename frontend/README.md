@@ -1,4 +1,4 @@
-# SIM-KPSTA Frontend
+# SIM-KP Frontend
 
 ## 📌 Progress Week 1 Frontend
 
