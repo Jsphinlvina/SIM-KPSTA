@@ -30,6 +30,7 @@ export default function LoginPage() {
         const { access_token, user } = response.data.data;
 
         localStorage.setItem("token", access_token);
+        localStorage.setItem("nim_nip", nimNip);
 
         if (user.role === "mahasiswa") {
           router.push("/mahasiswa");
@@ -46,8 +47,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F8F0] flex items-start justify-center px-4 pt-40">
-      <div className="w-full max-w-sm flex flex-col items-center">
+    <div className="min-h-screen bg-[#F7F8F0] flex items-center justify-center px-4">
+      <div className="w-full max-w-sm flex flex-col items-center -translate-y-14">
         {/* Logo */}
         <div>
           <Image
@@ -61,7 +62,7 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleLogin} className="w-full flex flex-col gap-6 -mt-10">
+        <form onSubmit={handleLogin} className="w-full flex flex-col gap-6">
           {/* Username */}
           <div className="relative">
             <User

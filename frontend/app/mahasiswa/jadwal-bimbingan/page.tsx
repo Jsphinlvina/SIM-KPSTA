@@ -3,8 +3,8 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import "react-calendar/dist/Calendar.css";
-
-import Sidebar from "@/app/components/sidebar";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 const Calendar = dynamic(
   () => import("react-calendar"),
@@ -24,193 +24,193 @@ export default function JadwalBimbinganPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F7F8F0]">
-      {/* Sidebar */}
-      <Sidebar />
+    <div className="w-full py-10 flex flex-col">
+      
+      {/* Header */}
+      <div className="flex items-start justify-between mb-10">
 
-      {/* Content */}
-      <div className="flex-1 p-10">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-start gap-4">
+          <Link 
+            href="/mahasiswa" 
+            className="
+              mt-1 
+              p-2 
+              rounded-full 
+              hover:bg-[#EAF4FB] 
+              transition 
+              text-[#355872]
+            "
+          >
+            <ArrowLeft size={32} />
+          </Link>
+
           <div>
             <h1 className="text-3xl font-bold text-[#355872]">
               Jadwal Bimbingan
             </h1>
-
             <p className="text-gray-500 mt-2">
               Pilih jadwal bimbingan yang tersedia
             </p>
           </div>
-
-          <div className="text-[#355872] font-medium">
-            Dosen Pembimbing :
-            <span className="ml-2 text-gray-600">
-              Budi Santoso, S.Kom, M.T
-            </span>
-          </div>
         </div>
 
-        {/* Main Content */}
-        <div
-          className="
-            bg-white
-            rounded-3xl
-            shadow-sm
-            border
-            border-[#e6eef5]
-            p-8
-          "
-        >
-          <div className="grid grid-cols-3 gap-8">
-            {/* Calendar */}
-            <div className="col-span-2">
-              <Calendar
-                onChange={handleDateClick}
-                value={date}
-                className="
-                  w-full
-                  border-none
-                  rounded-2xl
-                "
-              />
-            </div>
+        <div className="text-[#355872] font-medium mt-2">
+          Dosen Pembimbing :
+          <span className="ml-2 text-gray-600">
+            Budi Santoso, S.Kom, M.T
+          </span>
+        </div>
+      </div>
 
-            {/* Riwayat */}
-            <div
+      <div
+        className="
+          bg-white
+          rounded-3xl
+          shadow-sm
+          border
+          border-[#e6eef5]
+          p-8
+        "
+      >
+        <div className="grid grid-cols-3 gap-8">
+          {/* Calendar */}
+          <div className="col-span-2">
+            <Calendar
+              onChange={handleDateClick}
+              value={date}
               className="
-                bg-[#F7F8F0]
+                w-full
+                border-none
                 rounded-2xl
-                border
-                border-[#e6eef5]
-                p-6
-                h-fit
               "
-            >
-              <h2 className="text-xl font-bold text-[#355872] mb-6">
-                Riwayat Bimbingan
-              </h2>
+            />
+          </div>
 
-              <div className="space-y-3">
-                {/* Item */}
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-                    bg-white
-                    rounded-2xl
-                    px-5
-                    py-4
-                    border
-                    border-[#e6eef5]
-                  "
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="font-semibold text-[#355872]">
-                      1.
-                    </span>
+          {/* Riwayat */}
+          <div
+            className="
+              bg-[#EAF4FB]
+              rounded-2xl
+              border
+              border-[#e6eef5]
+              p-6
+              h-fit
+            "
+          >
+            <h2 className="text-xl font-bold text-[#355872] mb-6">
+              Riwayat Bimbingan
+            </h2>
 
-                    <span className="text-gray-700">
-                      2 Maret 2026
-                    </span>
-                  </div>
-
-                  <span
-                    className="
-                      px-3
-                      py-1
-                      rounded-full
-                      text-xs
-                      bg-green-100
-                      text-green-700
-                    "
-                  >
-                    Disetujui
+            <div className="space-y-3">
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-between
+                  bg-white
+                  rounded-2xl
+                  px-5
+                  py-4
+                  border
+                  border-[#e6eef5]
+                "
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-semibold text-[#355872]">
+                    1.
+                  </span>
+                  <span className="text-gray-700">
+                    2 Maret 2026
                   </span>
                 </div>
-
-                {/* Item */}
-                <div
+                <span
                   className="
-                    flex
-                    items-center
-                    justify-between
-                    bg-white
-                    rounded-2xl
-                    px-5
-                    py-4
-                    border
-                    border-[#e6eef5]
+                    px-3
+                    py-1
+                    rounded-full
+                    text-xs
+                    bg-green-100
+                    text-green-700
                   "
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="font-semibold text-[#355872]">
-                      2.
-                    </span>
+                  Disetujui
+                </span>
+              </div>
 
-                    <span className="text-gray-700">
-                      11 April 2026
-                    </span>
-                  </div>
-
-                  <span
-                    className="
-                      px-3
-                      py-1
-                      rounded-full
-                      text-xs
-                      bg-yellow-100
-                      text-yellow-700
-                    "
-                  >
-                    Pending
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-between
+                  bg-white
+                  rounded-2xl
+                  px-5
+                  py-4
+                  border
+                  border-[#e6eef5]
+                "
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-semibold text-[#355872]">
+                    2.
+                  </span>
+                  <span className="text-gray-700">
+                    11 April 2026
                   </span>
                 </div>
-
-                {/* Item */}
-                <div
+                <span
                   className="
-                    flex
-                    items-center
-                    justify-between
-                    bg-white
-                    rounded-2xl
-                    px-5
-                    py-4
-                    border
-                    border-[#e6eef5]
+                    px-3
+                    py-1
+                    rounded-full
+                    text-xs
+                    bg-yellow-100
+                    text-yellow-700
                   "
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="font-semibold text-[#355872]">
-                      3.
-                    </span>
+                  Pending
+                </span>
+              </div>
 
-                    <span className="text-gray-700">
-                      18 April 2026
-                    </span>
-                  </div>
-
-                  <span
-                    className="
-                      px-3
-                      py-1
-                      rounded-full
-                      text-xs
-                      bg-red-100
-                      text-red-700
-                    "
-                  >
-                    Ditolak
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-between
+                  bg-white
+                  rounded-2xl
+                  px-5
+                  py-4
+                  border
+                  border-[#e6eef5]
+                "
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-semibold text-[#355872]">
+                    3.
+                  </span>
+                  <span className="text-gray-700">
+                    18 April 2026
                   </span>
                 </div>
+                <span
+                  className="
+                    px-3
+                    py-1
+                    rounded-full
+                    text-xs
+                    bg-red-100
+                    text-red-700
+                  "
+                >
+                  Ditolak
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* MODAL */}
       {openModal && (
         <div
           className="
