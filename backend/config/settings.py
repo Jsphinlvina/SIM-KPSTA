@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'apps.notification',
     'apps.archive',
     'apps.authentication',
-    'apps.topik'
+    'apps.topik',
+    'apps.pengajuan',
 ]
 
 MIDDLEWARE = [
