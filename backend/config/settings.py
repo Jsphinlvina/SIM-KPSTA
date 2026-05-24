@@ -28,7 +28,9 @@ INSTALLED_APPS = [
     'apps.document',
     'apps.notification',
     'apps.archive',
+    'apps.authentication.apps.AuthenticationConfig',
 ]
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
