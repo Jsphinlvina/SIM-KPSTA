@@ -2,14 +2,53 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
+import api from "../api";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
+  const [nimNip, setNimNip] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const router = useRouter();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg("");
+
+    console.log("Tombol login diklik! Mengirim data:", { nimNip, password });
+
+    try {
+      const response = await api.post("/auth/login/", {
+        nim_nip: nimNip,
+        password: password,
+      });
+
+      if (response.data.success) {
+        const { access_token, user } = response.data.data;
+
+        localStorage.setItem("token", access_token);
+        localStorage.setItem("nim_nip", nimNip);
+
+        if (user.role === "mahasiswa") {
+          router.push("/mahasiswa");
+        } else if (user.role === "dosen") {
+          router.push("/dosen");
+        } else {
+          router.push("/");
+        }
+      }
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Terjadi kesalahan koneksi server.";
+      setErrorMsg(message);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#F7F8F0] flex items-start justify-center px-4 pt-40">
-      <div className="w-full max-w-sm flex flex-col items-center">
+    <div className="min-h-screen bg-[#F7F8F0] flex items-center justify-center px-4">
+      <div className="w-full max-w-sm flex flex-col items-center -translate-y-14">
         {/* Logo */}
         <div>
           <Image
@@ -23,7 +62,7 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form className="w-full flex flex-col gap-6 -mt-10">
+        <form onSubmit={handleLogin} className="w-full flex flex-col gap-6">
           {/* Username */}
           <div className="relative">
             <User
@@ -34,6 +73,8 @@ export default function LoginPage() {
             <input
               type="text"
               placeholder="NRP / NIM"
+              value ={nimNip}
+              onChange={(e)=>setNimNip(e.target.value)}
               className="
                 w-full
                 h-12
@@ -64,6 +105,8 @@ export default function LoginPage() {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
+              value={password}
+              onChange={(e)=>setPassword(e.target.value)}
               className="
                 w-full
                 h-12

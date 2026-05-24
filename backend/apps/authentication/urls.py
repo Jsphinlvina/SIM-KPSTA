@@ -1,0 +1,15 @@
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenRefreshView
+from apps.authentication.views import AuthController
+
+router = DefaultRouter()
+router.register(r'', AuthController, basename='auth-users')
+
+urlpatterns = [
+    path('', include(router.urls)),
+
+    path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('users/', AuthController.as_view({'get': 'list_users'}), name='user_list'),
+    path('users/<int:pk>/', AuthController.as_view({'get': 'manage_user', 'put': 'manage_user'}), name='user_detail'),
+]
