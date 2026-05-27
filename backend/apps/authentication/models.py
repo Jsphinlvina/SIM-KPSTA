@@ -32,6 +32,23 @@ class Users(AbstractBaseUser, PermissionsMixin):
         ('admin', 'admin'),
     )
 
+    # Avoid reverse accessor clashes with Django's built-in auth.User model.
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='authentication_users_groups',
+        blank=True,
+        help_text='The groups this user belongs to. (authentication)',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='authentication_users_user_permissions',
+        blank=True,
+        help_text='Specific permissions for this user. (authentication)',
+        verbose_name='user permissions',
+    )
+
+
     user_id = models.AutoField(primary_key=True)
     nim_nip = models.CharField(max_length=50, unique=True)
     nama_lengkap = models.CharField(max_length=255)
