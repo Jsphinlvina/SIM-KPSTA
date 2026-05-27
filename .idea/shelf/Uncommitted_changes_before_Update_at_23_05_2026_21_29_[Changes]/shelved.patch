@@ -1,0 +1,312 @@
+Index: backend/apps/topik/tests.py
+===================================================================
+diff --git a/backend/apps/topik/tests.py b/backend/apps/topik/tests.py
+deleted file mode 100644
+--- a/backend/apps/topik/tests.py	(revision b3928efae76e24b93f804349d672f86dc21beae2)
++++ /dev/null	(revision b3928efae76e24b93f804349d672f86dc21beae2)
+@@ -1,3 +0,0 @@
+-from django.test import TestCase
+-
+-# Create your tests here.
+Index: backend/apps/pengajuan/tests.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/apps/pengajuan/tests.py b/backend/apps/pengajuan/tests.py
+new file mode 100644
+--- /dev/null	(date 1779381773361)
++++ b/backend/apps/pengajuan/tests.py	(date 1779381773361)
+@@ -0,0 +1,3 @@
++from django.test import TestCase
++
++# Create your tests here.
+Index: backend/apps/pengajuan/services/pengajuan_validator.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/apps/pengajuan/services/pengajuan_validator.py b/backend/apps/pengajuan/services/pengajuan_validator.py
+new file mode 100644
+--- /dev/null	(date 1779387733752)
++++ b/backend/apps/pengajuan/services/pengajuan_validator.py	(date 1779387733752)
+@@ -0,0 +1,22 @@
++from rest_framework.exceptions import ValidationError
++from apps.topik.models import Topik
++
++class PengajuanValidator:
++
++    @staticmethod
++    def validate_topik_dosen(topik_id):
++        if not topik_id:
++            raise ValidationError({"topik": "ID topik dosen wajib disertakan."})
++        try:
++            topik = Topik.objects.get(pk=topik_id)
++        except Topik.DoesNotExist:
++            raise ValidationError({"topik": "Topik dosen tidak ditemukan."})
++
++        if topik.kuota <= 0:
++            raise ValidationError({"topik": f"Kuota untuk topik '{topik.judul}' telah habis."})
++        return topik
++
++    @staticmethod
++    def validate_mandiri(judul, deskripsi):
++        if not judul or not deskripsi:
++            raise ValidationError({"error": "Judul mandiri dan deskripsi sistem wajib diisi."})
+\ No newline at end of file
+Index: backend/apps/pengajuan/views.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/apps/pengajuan/views.py b/backend/apps/pengajuan/views.py
+new file mode 100644
+--- /dev/null	(date 1779386937515)
++++ b/backend/apps/pengajuan/views.py	(date 1779386937515)
+@@ -0,0 +1,34 @@
++from rest_framework import viewsets, status
++from rest_framework.decorators import action
++from rest_framework.permissions import IsAuthenticated
++from core.responses import ok, fail 
++from core.permissions import IsMahasiswa  
++
++from apps.pengajuan.models import PengajuanKP
++from apps.pengajuan.serializers import PengajuanKPSerializer
++from apps.pengajuan.services.pengajuan_service import PengajuanService
++
++
++class PengajuanKPViewSet(viewsets.ModelViewSet):
++    queryset = PengajuanKP.objects.all()
++    serializer_class = PengajuanKPSerializer
++
++    def get_permissions(self):
++        if self.action in ['create', 'riwayat_saya']:
++            return [IsAuthenticated(), IsMahasiswa()]
++        return [IsAuthenticated()]
++
++    def create(self, request, *args, **kwargs):
++        try:
++            pengajuan = PengajuanService.create_pengajuan(request.data, request.user)
++            serializer = self.get_serializer(pengajuan)
++            return ok(data=serializer.data, message="Judul KP/STA Anda berhasil diajukan! Menunggu persetujuan pembimbing.", status_code=status.HTTP_201_CREATED)
++        except Exception as e:
++            error_msg = e.detail if hasattr(e, 'detail') else str(e)
++            return fail(message=error_msg, status_code=status.HTTP_400_BAD_REQUEST)
++
++    @action(detail=False, methods=['get'], url_path='riwayat')
++    def riwayat_saya(self, request):
++        riwayat = PengajuanService.get_riwayat_mahasiswa(request.user.user_id)
++        serializer = self.get_serializer(riwayat, many=True)
++        return ok(data=serializer.data, message="Berhasil memuat seluruh riwayat pengajuan judul Anda.")
+\ No newline at end of file
+Index: backend/apps/pengajuan/urls.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/apps/pengajuan/urls.py b/backend/apps/pengajuan/urls.py
+new file mode 100644
+--- /dev/null	(date 1779386964508)
++++ b/backend/apps/pengajuan/urls.py	(date 1779386964508)
+@@ -0,0 +1,10 @@
++from django.urls import path, include
++from rest_framework.routers import DefaultRouter
++from apps.pengajuan.views import PengajuanKPViewSet
++
++router = DefaultRouter()
++router.register(r'judul', PengajuanKPViewSet, basename='judul-pengajuan')
++
++urlpatterns = [
++    path('', include(router.urls)),
++]
+\ No newline at end of file
+Index: backend/apps/pengajuan/services/pengajuan_service.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/apps/pengajuan/services/pengajuan_service.py b/backend/apps/pengajuan/services/pengajuan_service.py
+new file mode 100644
+--- /dev/null	(date 1779386884324)
++++ b/backend/apps/pengajuan/services/pengajuan_service.py	(date 1779386884324)
+@@ -0,0 +1,43 @@
++from apps.pengajuan.models import PengajuanKP
++from apps.topik.models import Topik
++from rest_framework.exceptions import ValidationError
++
++class PengajuanService:
++
++    @staticmethod
++    def create_pengajuan(data, mahasiswa_user):
++        topik_id = data.get('topik')
++        judul_diajukan = data.get('judul_diajukan')
++        deskripsi_sistem = data.get('deskripsi_sistem')
++
++        topik_instance = None
++
++        if topik_id:
++            try:
++                topik_instance = Topik.objects.get(pk=topik_id)
++            except Topik.DoesNotExist:
++                raise ValidationError({"topik": "Topik dosen yang Anda pilih tidak ditemukan."})
++
++            # Validasi Kuota: Pastikan kuota topik dosen belum habis (harus > 0)
++            if topik_instance.kuota <= 0:
++                raise ValidationError({"topik": f"Maaf, kuota untuk topik '{topik_instance.judul}' sudah habis diklaim mahasiswa lain."})
++
++            if not judul_diajukan:
++                judul_diajukan = topik_instance.judul
++
++        if not judul_diajukan:
++            raise ValidationError({"judul_diajukan": "Judul pengajuan wajib diisi jika Anda mengambil jalur mandiri."})
++
++        pengajuan = PengajuanKP.objects.create(
++            mahasiswa=mahasiswa_user,
++            topik=topik_instance,
++            judul_diajukan=judul_diajukan,
++            deskripsi_sistem=deskripsi_sistem
++        )
++
++        return pengajuan
++
++    @staticmethod
++    def get_riwayat_mahasiswa(mahasiswa_id):
++        """Mengambil daftar seluruh riwayat judul yang pernah diajukan oleh mahasiswa ybs"""
++        return PengajuanKP.objects.filter(mahasiswa_id=mahasiswa_id).select_related('topik', 'topik__user')
+\ No newline at end of file
+Index: backend/apps/pengajuan/migrations/0001_initial.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/apps/pengajuan/migrations/0001_initial.py b/backend/apps/pengajuan/migrations/0001_initial.py
+new file mode 100644
+--- /dev/null	(date 1779386539307)
++++ b/backend/apps/pengajuan/migrations/0001_initial.py	(date 1779386539307)
+@@ -0,0 +1,34 @@
++# Generated by Django 5.1.4 on 2026-05-21 18:02
++
++import django.db.models.deletion
++from django.conf import settings
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++
++    initial = True
++
++    dependencies = [
++        ('topik', '0001_initial'),
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name='PengajuanKP',
++            fields=[
++                ('pengajuan_kp_id', models.AutoField(primary_key=True, serialize=False)),
++                ('judul_diajukan', models.CharField(max_length=255)),
++                ('deskripsi_sistem', models.TextField(help_text='Abstrak atau gambaran umum sistem yang akan dibuat')),
++                ('status_pengajuan', models.CharField(choices=[('pending', 'Pending'), ('disetujui_pembimbing', 'Disetujui Pembimbing'), ('disetujui_koordinator', 'Disetujui Koordinator'), ('ditolak', 'Ditolak')], default='pending', max_length=25)),
++                ('catatan', models.TextField(blank=True, help_text='Catatan revisi dari dosen atau koordinator', null=True)),
++                ('created_at', models.DateTimeField(auto_now_add=True)),
++                ('mahasiswa', models.ForeignKey(limit_choices_to={'role': 'mahasiswa'}, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
++                ('topik', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='topik.topik')),
++            ],
++            options={
++                'db_table': 'pengajuan_kp',
++            },
++        ),
++    ]
+Index: backend/apps/pengajuan/admin.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/apps/pengajuan/admin.py b/backend/apps/pengajuan/admin.py
+new file mode 100644
+--- /dev/null	(date 1779381773353)
++++ b/backend/apps/pengajuan/admin.py	(date 1779381773353)
+@@ -0,0 +1,3 @@
++from django.contrib import admin
++
++# Register your models here.
+Index: backend/apps/pengajuan/apps.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/apps/pengajuan/apps.py b/backend/apps/pengajuan/apps.py
+new file mode 100644
+--- /dev/null	(date 1779384206243)
++++ b/backend/apps/pengajuan/apps.py	(date 1779384206243)
+@@ -0,0 +1,6 @@
++from django.apps import AppConfig
++
++
++class PengajuanConfig(AppConfig):
++    default_auto_field = 'django.db.models.BigAutoField'
++    name = 'apps.pengajuan'
+Index: backend/apps/pengajuan/serializers.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/apps/pengajuan/serializers.py b/backend/apps/pengajuan/serializers.py
+new file mode 100644
+--- /dev/null	(date 1779386796115)
++++ b/backend/apps/pengajuan/serializers.py	(date 1779386796115)
+@@ -0,0 +1,21 @@
++from rest_framework import serializers
++from apps.pengajuan.models import PengajuanKP
++from apps.authentication.serializers import UserSerializer
++from apps.topik.serializers import TopikSerializer
++
++class PengajuanKPSerializer(serializers.ModelSerializer):
++    mahasiswa_detail = UserSerializer(source='mahasiswa', read_only=True)
++    topik_detail = TopikSerializer(source='topik', read_only=True)
++
++    class Meta:
++        model = PengajuanKP
++        fields = [
++            'pengajuan_kp_id', 'mahasiswa', 'topik', 'judul_diajukan', 
++            'deskripsi_sistem', 'status_pengajuan', 'catatan', 'created_at',
++            'mahasiswa_detail', 'topik_detail'
++        ]
++        extra_kwargs = {
++            'mahasiswa': {'required': False},  
++            'status_pengajuan': {'read_only': True},
++            'catatan': {'read_only': True} 
++        }
+\ No newline at end of file
+Index: backend/apps/pengajuan/models.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/apps/pengajuan/models.py b/backend/apps/pengajuan/models.py
+new file mode 100644
+--- /dev/null	(date 1779387653442)
++++ b/backend/apps/pengajuan/models.py	(date 1779387653442)
+@@ -0,0 +1,16 @@
++from django.db import models
++from apps.authentication.models import Users
++from apps.topik.models import Topik
++
++class PengajuanKP(models.Model):
++    pengajuan_kp_id = models.AutoField(primary_key=True)
++    mahasiswa = models.ForeignKey(Users, on_delete=models.CASCADE, limit_choices_to={'role': 'mahasiswa'})
++    topik = models.ForeignKey(Topik, on_delete=models.SET_NULL, null=True, blank=True)
++    judul_diajukan = models.CharField(max_length=255)
++    deskripsi_sistem = models.TextField()
++    status_pengajuan = models.CharField(max_length=25, default='draft')
++    catatan = models.TextField(null=True, blank=True)
++    created_at = models.DateTimeField(auto_now_add=True)
++
++    class Meta:
++        db_table = 'pengajuan_kp'
+\ No newline at end of file
+diff --git a/backend/apps/pengajuan/__init__.py b/backend/apps/pengajuan/__init__.py
+new file mode 100644
+diff --git a/backend/apps/pengajuan/migrations/__init__.py b/backend/apps/pengajuan/migrations/__init__.py
+new file mode 100644
