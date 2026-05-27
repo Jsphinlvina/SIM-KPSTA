@@ -18,8 +18,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {children}
+      <body className={`${inter.className} bg-[#F7F8F0] min-h-screen`}>
+        <div className="w-3/4 mx-auto relative min-h-screen flex flex-col">
+          {children}
+        </div>
+        
       </body>
     </html>
   );
