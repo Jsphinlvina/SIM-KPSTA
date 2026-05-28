@@ -70,18 +70,18 @@ export default function ListTopikPage() {
     }
   }, [activeTab]);
 
-  const handleAjukanTopikDosen = async (topikId: number) => {
-    if (!confirm("Apakah Anda yakin ingin mengajukan draf untuk topik dosen ini?")) return;
-    try {
-      const res = await api.post("/pengajuan/topik-dosen/", { topik: topikId });
-      if (res.data.success) {
-        alert(res.data.message || "Draft pengajuan berhasil dibuat!");
-        setActiveTab("riwayat"); 
-      }
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Gagal memproses pengajuan.");
+  const handleSubmitDraft = async (id: number) => {
+  if (!confirm("Apakah Anda yakin ingin mengirim pengajuan ini ke Dosen? Status tidak dapat dikembalikan ke draft.")) return;
+  try {
+    const res = await api.post(`/pengajuan/${id}/submit/`);
+    if (res.data.success) {
+      alert(res.data.message || "Sukses mengirim pengajuan!");
+      fetchRiwayatSaya(); 
     }
-  };
+  } catch (err: any) {
+    alert(err.response?.data?.message || "Gagal mengirim pengajuan.");
+  }
+};
 
   return (
     <div className="w-full py-10 flex flex-col">
@@ -183,29 +183,34 @@ export default function ListTopikPage() {
                 <th className="px-6 py-4">Status Transisi</th>
               </tr>
             </thead>
-            <tbody>
-              {riwayat.length === 0 ? (
-                <tr><td colSpan={3} className="text-center py-8 text-gray-400">Anda belum pernah mengajukan judul apa pun.</td></tr>
-              ) : (
-                riwayat.map((item) => (
-                  <tr key={item.pengajuan_kp_id} className="border-t border-[#eef4f8] text-[#355872]">
-                    <td className="px-6 py-5 font-medium">{item.judul_diajukan}</td>
-                    <td className="px-6 py-5 text-gray-600">
-                      {item.topik_detail?.dosen_detail?.nama_lengkap || "💡 Jalur Mandiri (Diusulkan)"}
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className={`px-4 py-1.5 rounded-full text-xs font-semibold uppercase ${
-                        item.status_pengajuan === "approved" ? "bg-green-100 text-green-700" :
-                        item.status_pengajuan === "submitted" ? "bg-blue-100 text-blue-700" :
-                        item.status_pengajuan === "rejected" ? "bg-red-100 text-red-700" :
-                        "bg-gray-100 text-gray-700"
-                      }`}>
-                        {item.status_pengajuan}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
+              <tbody>
+              {riwayat.map((item) => (
+                <tr key={item.pengajuan_kp_id} className="border-t border-[#eef4f8] text-[#355872]">
+                  <td className="px-6 py-5 font-medium">{item.judul_diajukan}</td>
+                  <td className="px-6 py-5 text-gray-600">
+                    {item.topik_detail?.dosen_detail?.nama_lengkap || "💡 Jalur Mandiri (Diusulkan)"}
+                  </td>
+                  <td className="px-6 py-5 flex items-center justify-between gap-4">
+                    <span className={`px-4 py-1.5 rounded-full text-xs font-semibold uppercase ${
+                      item.status_pengajuan === "approved" ? "bg-green-100 text-green-700" :
+                      item.status_pengajuan === "submitted" ? "bg-blue-100 text-blue-700" :
+                      item.status_pengajuan === "rejected" ? "bg-red-100 text-red-700" :
+                      "bg-gray-100 text-gray-700"
+                    }`}>
+                      {item.status_pengajuan}
+                    </span>
+
+                    {item.status_pengajuan === "draft" && (
+                      <button
+                        onClick={() => handleSubmitDraft(item.pengajuan_kp_id)}
+                        className="px-3 py-1 bg-[#355872] text-white rounded-xl text-xs font-medium hover:bg-[#7AAACE] transition"
+                      >
+                        Kirim ➔
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

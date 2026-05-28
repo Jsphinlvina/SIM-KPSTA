@@ -51,10 +51,10 @@ class TopikViewSet(viewsets.ModelViewSet):
         try:
             topik = TopikService.create_topik_penawaran(request.data, request.user)
             serializer = self.get_serializer(topik)
-            return ok(data=serializer.data, message="Topik penawaran baru berhasil disiarkan.", status_code=status.HTTP_201_CREATED)
+            return ok(data=serializer.data, message="Topik penawaran baru berhasil disiarkan.")
         except Exception as e:
             error_msg = e.detail if hasattr(e, 'detail') else str(e)
-            return fail(message=error_msg, status_code=status.HTTP_400_BAD_REQUEST)
+            return fail(message=error_msg)
 
     @action(detail=False, methods=['get'], url_path='available')
     def available_topik(self, request):
