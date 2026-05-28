@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Upload, ArrowLeft } from "lucide-react";
+import Sidebar from "@/app/components/sidebar";
 
 export default function UploadLaporanPage() {
   const uploads = [
@@ -18,7 +19,9 @@ export default function UploadLaporanPage() {
   ];
 
   return (
-    <div className="w-full py-10 flex flex-col">
+    <div className="flex min-h-screen bg-[#F7F8F0]">
+      <Sidebar />
+      <div className="flex-1 p-10 flex flex-col">
       
       {/* Header */}
       <div className="flex items-start gap-4 mb-10">
@@ -143,6 +146,7 @@ export default function UploadLaporanPage() {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

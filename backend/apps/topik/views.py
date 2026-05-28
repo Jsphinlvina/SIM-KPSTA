@@ -23,15 +23,15 @@ class PeriodeSemesterViewSet(viewsets.ModelViewSet):
         try:
             periode = PeriodeService.create_periode(request.data)
             serializer = self.get_serializer(periode)
-            return ok(data=serializer.data, message="Periode akademik baru berhasil dibuat.", status_code=status.HTTP_201_CREATED)
+            return ok(data=serializer.data, message="Periode akademik baru berhasil dibuat.", status=status.HTTP_201_CREATED)
         except Exception as e:
-            return fail(message=str(e), status_code=status.HTTP_400_BAD_REQUEST)
+            return fail(message=str(e), status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], url_path='active')
     def get_active(self, request):
         periode = PeriodeService.get_active_periode()
         if not periode:
-            return fail(message="Belum ada periode akademik yang aktif.", status_code=status.HTTP_404_NOT_FOUND)
+            return fail(message="Belum ada periode akademik yang aktif.", status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(periode)
         return ok(data=serializer.data, message="Berhasil mengambil periode aktif.")
 
@@ -49,10 +49,22 @@ class TopikViewSet(viewsets.ModelViewSet):
         try:
             topik = TopikService.create_topik_penawaran(request.data, request.user)
             serializer = self.get_serializer(topik)
-            return ok(data=serializer.data, message="Topik penawaran baru berhasil disiarkan.", status_code=status.HTTP_201_CREATED)
+            return ok(data=serializer.data, message="Topik penawaran baru berhasil disiarkan.", status=status.HTTP_201_CREATED)
         except Exception as e:
             error_msg = e.detail if hasattr(e, 'detail') else str(e)
-            return fail(message=error_msg, status_code=status.HTTP_400_BAD_REQUEST)
+            return fail(message=error_msg, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return ok(data=serializer.data, message="Topik penawaran Kerja Praktik berhasil diperbarui.")
+        except Exception as e:
+            error_msg = e.detail if hasattr(e, 'detail') else str(e)
+            return fail(message=error_msg, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], url_path='available')
     def available_topik(self, request):
