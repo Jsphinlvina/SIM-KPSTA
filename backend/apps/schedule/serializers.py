@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from .models import ScheduleEvent
+
 
 class AvailabilityCheckQuerySerializer(serializers.Serializer):
     lecturer_id = serializers.IntegerField()
@@ -10,3 +12,53 @@ class AvailabilityCheckQuerySerializer(serializers.Serializer):
 class AvailableSlotsQuerySerializer(serializers.Serializer):
     lecturer_id = serializers.IntegerField()
     date = serializers.DateField()
+
+
+class ScheduleEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduleEvent
+        fields = [
+            'id', 'bimbingan_aktif_id', 'lecturer_id', 'student_id', 'coordinator_id',
+            'event_type', 'date', 'time', 'location', 'meeting_link', 'notes', 'status',
+            'created_at', 'updated_at',
+        ]
+        read_only_fields = fields
+
+
+class GuidanceCreateSerializer(serializers.Serializer):
+    bimbingan_aktif_id = serializers.IntegerField()
+    lecturer_id = serializers.IntegerField()
+    date = serializers.DateField()
+    time = serializers.TimeField()
+    location = serializers.CharField(required=False, allow_blank=True, max_length=255)
+    notes = serializers.CharField(required=False, allow_blank=True)
+
+
+class GuidanceUpdateSerializer(serializers.Serializer):
+    location = serializers.CharField(required=False, allow_blank=True, max_length=255)
+    notes = serializers.CharField(required=False, allow_blank=True)
+
+
+class RescheduleSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    time = serializers.TimeField()
+
+
+class DefenseCreateSerializer(serializers.Serializer):
+    bimbingan_aktif_id = serializers.IntegerField()
+    lecturer_id = serializers.IntegerField()
+    student_id = serializers.IntegerField()
+    coordinator_id = serializers.IntegerField()
+    date = serializers.DateField()
+    time = serializers.TimeField()
+    location = serializers.CharField(required=False, allow_blank=True, max_length=255)
+    meeting_link = serializers.CharField(required=False, allow_blank=True, max_length=500)
+    notes = serializers.CharField(required=False, allow_blank=True)
+
+
+class DefenseUpdateSerializer(serializers.Serializer):
+    date = serializers.DateField(required=False)
+    time = serializers.TimeField(required=False)
+    location = serializers.CharField(required=False, allow_blank=True, max_length=255)
+    meeting_link = serializers.CharField(required=False, allow_blank=True, max_length=500)
+    notes = serializers.CharField(required=False, allow_blank=True)

@@ -1,4 +1,4 @@
-from datetime import date as _Date, datetime as _DateTime, time as _Time, timedelta
+from datetime import date as _Date, datetime as _DateTime, timedelta, time as _Time
 
 WORK_HOURS_START = _Time(9, 0)
 WORK_HOURS_END = _Time(15, 0)
@@ -13,43 +13,48 @@ def _overlaps(start_a, end_a, start_b, end_b):
     return start_a < end_b and start_b < end_a
 
 
-def _seed_dummy():
-    return {
-        1: [
-            (_Date(2026, 5, 12), _Time(9, 0), _Time(10, 0)),
-            (_Date(2026, 5, 12), _Time(13, 0), _Time(14, 0)),
-            (_Date(2026, 5, 13), _Time(10, 0), _Time(11, 0)),
-        ],
-        2: [
-            (_Date(2026, 5, 12), _Time(11, 0), _Time(12, 0)),
-        ],
-    }
-
-
 class ScheduleAvailabilityDetector:
     _instance = None
 
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._cache = _seed_dummy()
+            cls._instance._cache = {}
         return cls._instance
 
     @classmethod
     def get_instance(cls):
         return cls()
 
-    def reset_cache(self, data=None):
-        self._cache = data if data is not None else _seed_dummy()
+    def reset_cache(self):
+        self._cache = {}
 
-    def _bookings_on(self, lecturer_id, on_date):
-        return [(s, e) for (d, s, e) in self._cache.get(lecturer_id, []) if d == on_date]
+    def invalidate(self, lecturer_id, on_date):
+        self._cache.pop((lecturer_id, on_date), None)
 
-    def is_available(self, lecturer_id, on_date, at_time):
+    def _bookings_on(self, lecturer_id, on_date, exclude_event_id=None):
+        key = (lecturer_id, on_date)
+        if key not in self._cache:
+            from apps.schedule.models import ScheduleEvent
+            events = ScheduleEvent.objects.filter(
+                lecturer_id=lecturer_id, date=on_date,
+            ).exclude(status=ScheduleEvent.STATUS_CANCELLED)
+            self._cache[key] = [
+                (event.id, event.time, _add_minutes(event.time, SLOT_DURATION_MINUTES))
+                for event in events
+            ]
+        return [
+            (start, end)
+            for (event_id, start, end) in self._cache[key]
+            if event_id != exclude_event_id
+        ]
+
+    def is_available(self, lecturer_id, on_date, at_time, exclude_event_id=None):
         if not (WORK_HOURS_START <= at_time < WORK_HOURS_END):
             return False
         end = _add_minutes(at_time, SLOT_DURATION_MINUTES)
-        return not any(_overlaps(at_time, end, s, e) for s, e in self._bookings_on(lecturer_id, on_date))
+        bookings = self._bookings_on(lecturer_id, on_date, exclude_event_id)
+        return not any(_overlaps(at_time, end, s, e) for s, e in bookings)
 
     def open_slots(self, lecturer_id, on_date):
         bookings = self._bookings_on(lecturer_id, on_date)
