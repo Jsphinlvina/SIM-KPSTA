@@ -1,43 +1,39 @@
 from apps.pengajuan.models import PengajuanKP
-from apps.topik.models import Topik
-from rest_framework.exceptions import ValidationError
+from apps.pengajuan.patterns.factory.pengajuan_topik_dosen_factory import PengajuanTopikDosenFactory
+from apps.pengajuan.patterns.factory.pengajuan_mandiri_factory import PengajuanMandiriFactory
+
+from apps.pengajuan.patterns.state.draft_state import DraftState
+from apps.pengajuan.patterns.state.submitted_state import SubmittedState
+from apps.pengajuan.patterns.state.approved_state import ApprovedState
+from apps.pengajuan.patterns.state.rejected_state import RejectedState
 
 class PengajuanService:
 
-    @staticmethod
-    def create_pengajuan(data, mahasiswa_user):
-        topik_id = data.get('topik')
-        judul_diajukan = data.get('judul_diajukan')
-        deskripsi_sistem = data.get('deskripsi_sistem')
+    def __init__(self, instance=None):
+        self.instance = instance
+        self.state = None
+        if instance:
+            self._load_state()
 
-        topik_instance = None
-
-        if topik_id:
-            try:
-                topik_instance = Topik.objects.get(pk=topik_id)
-            except Topik.DoesNotExist:
-                raise ValidationError({"topik": "Topik dosen yang Anda pilih tidak ditemukan."})
-
-            # Validasi Kuota: Pastikan kuota topik dosen belum habis (harus > 0)
-            if topik_instance.kuota <= 0:
-                raise ValidationError({"topik": f"Maaf, kuota untuk topik '{topik_instance.judul}' sudah habis diklaim mahasiswa lain."})
-
-            if not judul_diajukan:
-                judul_diajukan = topik_instance.judul
-
-        if not judul_diajukan:
-            raise ValidationError({"judul_diajukan": "Judul pengajuan wajib diisi jika Anda mengambil jalur mandiri."})
-
-        pengajuan = PengajuanKP.objects.create(
-            mahasiswa=mahasiswa_user,
-            topik=topik_instance,
-            judul_diajukan=judul_diajukan,
-            deskripsi_sistem=deskripsi_sistem
-        )
-
-        return pengajuan
+    def _load_state(self):
+        status = self.instance.status_pengajuan
+        if status == 'draft': self.state = DraftState()
+        elif status == 'submitted': self.state = SubmittedState()
+        elif status == 'approved': self.state = ApprovedState()
+        elif status == 'rejected': self.state = RejectedState()
 
     @staticmethod
-    def get_riwayat_mahasiswa(mahasiswa_id):
-        """Mengambil daftar seluruh riwayat judul yang pernah diajukan oleh mahasiswa ybs"""
-        return PengajuanKP.objects.filter(mahasiswa_id=mahasiswa_id).select_related('topik', 'topik__user')
+    def create_via_factory(tipe, data, user):
+        if tipe == 'topik-dosen': factory = PengajuanTopikDosenFactory()
+        else: factory = PengajuanMandiriFactory()
+        return factory.create_pengajuan(data, user)
+
+    # State Actions
+    def trigger_submit(self): self.state.submit(self)
+    def trigger_approve(self): self.state.approve(self)
+    def trigger_reject(self, catatan):
+        self.instance.catatan = catatan
+        self.state.reject(self)
+    def trigger_revise(self, catatan):
+        self.instance.catatan = catatan
+        self.state.revise(self)

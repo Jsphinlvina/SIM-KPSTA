@@ -32,7 +32,6 @@ class Users(AbstractBaseUser, PermissionsMixin):
         ('admin', 'admin'),
     )
 
-    # Avoid reverse accessor clashes with Django's built-in auth.User model.
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='authentication_users_groups',
@@ -40,6 +39,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
         help_text='The groups this user belongs to. (authentication)',
         verbose_name='groups',
     )
+    
     user_permissions = models.ManyToManyField(
         'auth.Permission',
         related_name='authentication_users_user_permissions',

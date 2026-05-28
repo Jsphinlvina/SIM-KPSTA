@@ -8,7 +8,7 @@ class PengajuanKP(models.Model):
     topik = models.ForeignKey(Topik, on_delete=models.SET_NULL, null=True, blank=True)
     judul_diajukan = models.CharField(max_length=255)
     deskripsi_sistem = models.TextField()
-    status_pengajuan = models.CharField(max_length=25, default='draft')
+    status_pengajuan = models.CharField(max_length=25, default='draft') 
     catatan = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

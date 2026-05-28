@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from core.responses import ok, fail
 from core.permissions import IsDosen, IsAdmin
 
@@ -39,6 +40,7 @@ class PeriodeSemesterViewSet(viewsets.ModelViewSet):
 class TopikViewSet(viewsets.ModelViewSet):
     queryset = Topik.objects.all()
     serializer_class = TopikSerializer
+    authentication_classes = [JWTAuthentication]
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy', 'by_dosen']:
@@ -56,9 +58,12 @@ class TopikViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='available')
     def available_topik(self, request):
-        topik_list = TopikService.get_available_topik()
-        serializer = self.get_serializer(topik_list, many=True)
-        return ok(data=serializer.data, message="Berhasil mengambil daftar topik berkuota sisa.")
+        try:
+            available_records = self.queryset.filter(kuota__gt=0)
+            serializer = self.get_serializer(available_records, many=True)
+            return ok(data=serializer.data, message="Berhasil memuat daftar topik dosen aktif.")
+        except Exception as e:
+            return fail(message=str(e))
 
     @action(detail=False, methods=['get'], url_path='by-dosen/(?P<dosen_id>[^/.]+)')
     def by_dosen(self, request, dosen_id=None):
