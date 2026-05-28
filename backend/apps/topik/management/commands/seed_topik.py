@@ -12,7 +12,6 @@ class Command(BaseCommand):
             self.style.WARNING("=== Memulai Seeding Data Periode & Topik ===")
         )
 
-        # 1. Ambil data user ber-role dosen hasil dari seed_users kemarin
         dosen_1 = Users.objects.filter(role="dosen").first()
 
         if not dosen_1:
@@ -26,7 +25,6 @@ class Command(BaseCommand):
 
         try:
             with transaction.atomic():
-                # 2. Pembuatan Periode Semester Aktif
                 periode, created = PeriodeSemester.objects.get_or_create(
                     nama_periode="2025/2026 Ganjil",
                     defaults={"status_periode": "aktif"},
@@ -38,7 +36,6 @@ class Command(BaseCommand):
                         )
                     )
 
-                # 3. Pembuatan Daftar Topik Penawaran Dosen
                 topik_data = [
                     {
                         "user": dosen_1,

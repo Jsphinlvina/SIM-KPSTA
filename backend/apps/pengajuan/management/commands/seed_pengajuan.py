@@ -14,9 +14,8 @@ class Command(BaseCommand):
             self.style.WARNING("=== Memulai Seeding Data Pengajuan KP ===")
         )
 
-        # 1. Ambil data user mahasiswa dari hasil seed_users sebelumnya
         mahasiswa_1 = Users.objects.filter(nim_nip="2272001", role="mahasiswa").first()
-        mahasiswa_2 = Users.objects.filter(nim_nip="220011", role="mahasiswa").first()
+        mahasiswa_2 = Users.objects.filter(nim_nip="2272002", role="mahasiswa").first()
 
         if not mahasiswa_1:
             self.stdout.write(

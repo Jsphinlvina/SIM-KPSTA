@@ -11,7 +11,7 @@ interface TopikDosen {
   judul: string;
   deskripsi: string;
   kuota: number;
-  user_detail?: {
+  dosen_detail?: {
     nama_lengkap: string;
   };
 }
@@ -21,7 +21,7 @@ interface RiwayatPengajuan {
   judul_diajukan: string;
   status_pengajuan: string;
   topik_detail?: {
-    user_detail?: {
+    dosen_detail?: {
       nama_lengkap: string;
     };
   };
@@ -154,7 +154,7 @@ export default function ListTopikPage() {
                         <p className="text-sm text-gray-500 mt-1">{item.deskripsi}</p>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-gray-700">{item.user_detail?.nama_lengkap || "Dosen Pengampu"}</td>
+                    <td className="px-6 py-5 text-gray-700">{item.dosen_detail?.nama_lengkap || "Dosen Pengampu"}</td>
                     <td className="px-6 py-5 text-gray-700">{item.kuota}</td>
                     <td className="px-6 py-5">
                       <button
@@ -191,7 +191,7 @@ export default function ListTopikPage() {
                   <tr key={item.pengajuan_kp_id} className="border-t border-[#eef4f8] text-[#355872]">
                     <td className="px-6 py-5 font-medium">{item.judul_diajukan}</td>
                     <td className="px-6 py-5 text-gray-600">
-                      {item.topik_detail?.user_detail?.nama_lengkap || "💡 Jalur Mandiri (Diusulkan)"}
+                      {item.topik_detail?.dosen_detail?.nama_lengkap || "💡 Jalur Mandiri (Diusulkan)"}
                     </td>
                     <td className="px-6 py-5">
                       <span className={`px-4 py-1.5 rounded-full text-xs font-semibold uppercase ${
