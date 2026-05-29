@@ -1,0 +1,17 @@
+# Editor / IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python (jaring pengaman level repo; backend/ punya .gitignore sendiri)
+__pycache__/
+*.py[codz]
+venv/
+.venv/
+*.sqlite3
+.env
+.env.*
+!.env.example

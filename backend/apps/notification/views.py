@@ -1,5 +1,7 @@
 from rest_framework import status as http_status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from core.responses import fail, ok
 
@@ -7,10 +9,15 @@ from .serializers import NotificationSerializer
 from .services import notification_service
 
 
+class _AuthView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
 def _get_user_id(request):
     user = getattr(request, 'user', None)
     if user is not None and user.is_authenticated:
-        return user.id
+        return user.pk
     raw = request.query_params.get('user_id')
     try:
         return int(raw)
@@ -18,7 +25,7 @@ def _get_user_id(request):
         return None
 
 
-class NotificationListView(APIView):
+class NotificationListView(_AuthView):
     def get(self, request):
         user_id = _get_user_id(request)
         if user_id is None:
@@ -27,7 +34,7 @@ class NotificationListView(APIView):
         return ok(NotificationSerializer(notifications, many=True).data)
 
 
-class UnreadNotificationListView(APIView):
+class UnreadNotificationListView(_AuthView):
     def get(self, request):
         user_id = _get_user_id(request)
         if user_id is None:
@@ -36,7 +43,7 @@ class UnreadNotificationListView(APIView):
         return ok(NotificationSerializer(notifications, many=True).data)
 
 
-class MarkAsReadView(APIView):
+class MarkAsReadView(_AuthView):
     def post(self, request, notification_id):
         user_id = _get_user_id(request)
         if user_id is None:
@@ -47,7 +54,7 @@ class MarkAsReadView(APIView):
         return ok(NotificationSerializer(notification).data, message='Notifikasi ditandai sudah dibaca')
 
 
-class MarkAllAsReadView(APIView):
+class MarkAllAsReadView(_AuthView):
     def post(self, request):
         user_id = _get_user_id(request)
         if user_id is None:
@@ -56,7 +63,7 @@ class MarkAllAsReadView(APIView):
         return ok({'updated': updated}, message='Semua notifikasi ditandai sudah dibaca')
 
 
-class DeleteNotificationView(APIView):
+class DeleteNotificationView(_AuthView):
     def delete(self, request, notification_id):
         user_id = _get_user_id(request)
         if user_id is None:

@@ -1,12 +1,36 @@
+from rest_framework import status as http_status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from core.responses import fail, ok
+from core.exceptions import DomainError, ScheduleConflictError
+from core.permissions import IsDosen, IsKoordinator, IsMahasiswa
+from core.responses import created, fail, ok
 
-from .serializers import AvailabilityCheckQuerySerializer, AvailableSlotsQuerySerializer
-from .services import availability_service
+from .serializers import (
+    AvailabilityCheckQuerySerializer,
+    AvailableSlotsQuerySerializer,
+    DefenseCreateSerializer,
+    DefenseUpdateSerializer,
+    GuidanceCreateSerializer,
+    GuidanceUpdateSerializer,
+    RescheduleSerializer,
+    ScheduleEventSerializer,
+)
+from .services import availability_service, defense_service, guidance_service
 
 
-class CheckAvailabilityView(APIView):
+class _AuthView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
+def _domain_fail(exc):
+    status = http_status.HTTP_409_CONFLICT if isinstance(exc, ScheduleConflictError) else http_status.HTTP_400_BAD_REQUEST
+    return fail(exc.message, errors=exc.errors, status=status)
+
+
+class CheckAvailabilityView(_AuthView):
     def get(self, request):
         params = AvailabilityCheckQuerySerializer(data=request.query_params)
         if not params.is_valid():
@@ -22,7 +46,7 @@ class CheckAvailabilityView(APIView):
         return ok(data)
 
 
-class OpenSlotsView(APIView):
+class OpenSlotsView(_AuthView):
     def get(self, request):
         params = AvailableSlotsQuerySerializer(data=request.query_params)
         if not params.is_valid():
@@ -34,7 +58,7 @@ class OpenSlotsView(APIView):
         return ok(data)
 
 
-class ConflictsView(APIView):
+class ConflictsView(_AuthView):
     def get(self, request):
         params = AvailableSlotsQuerySerializer(data=request.query_params)
         if not params.is_valid():
@@ -44,3 +68,181 @@ class ConflictsView(APIView):
             params.validated_data['date'],
         )
         return ok(data)
+
+
+class GuidanceListCreateView(_AuthView):
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsMahasiswa()]
+        return [IsAuthenticated()]
+
+    def get(self, request):
+        schedules = guidance_service.list_schedules()
+        return ok(ScheduleEventSerializer(schedules, many=True).data)
+
+    def post(self, request):
+        payload = GuidanceCreateSerializer(data=request.data)
+        if not payload.is_valid():
+            return fail('Data tidak valid', errors=payload.errors)
+        try:
+            event = guidance_service.create_schedule(payload.validated_data)
+        except DomainError as exc:
+            return _domain_fail(exc)
+        return created(ScheduleEventSerializer(event).data, message='Jadwal bimbingan dibuat')
+
+
+class GuidanceDetailView(_AuthView):
+    def get_permissions(self):
+        if self.request.method in ('PUT', 'DELETE'):
+            return [(IsMahasiswa | IsDosen)()]
+        return [IsAuthenticated()]
+
+    def get(self, request, schedule_id):
+        event = guidance_service.get_schedule(schedule_id)
+        if event is None:
+            return fail('Jadwal tidak ditemukan', status=http_status.HTTP_404_NOT_FOUND)
+        return ok(ScheduleEventSerializer(event).data)
+
+    def put(self, request, schedule_id):
+        event = guidance_service.get_schedule(schedule_id)
+        if event is None:
+            return fail('Jadwal tidak ditemukan', status=http_status.HTTP_404_NOT_FOUND)
+        payload = GuidanceUpdateSerializer(data=request.data)
+        if not payload.is_valid():
+            return fail('Data tidak valid', errors=payload.errors)
+        event = guidance_service.update_schedule(event, payload.validated_data)
+        return ok(ScheduleEventSerializer(event).data, message='Jadwal bimbingan diperbarui')
+
+    def delete(self, request, schedule_id):
+        event = guidance_service.get_schedule(schedule_id)
+        if event is None:
+            return fail('Jadwal tidak ditemukan', status=http_status.HTTP_404_NOT_FOUND)
+        guidance_service.delete_schedule(event)
+        return ok(message='Jadwal bimbingan dihapus')
+
+
+class GuidanceStartView(_AuthView):
+    permission_classes = [IsDosen]
+
+    def post(self, request, schedule_id):
+        event = guidance_service.get_schedule(schedule_id)
+        if event is None:
+            return fail('Jadwal tidak ditemukan', status=http_status.HTTP_404_NOT_FOUND)
+        try:
+            event = guidance_service.start_schedule(event)
+        except DomainError as exc:
+            return _domain_fail(exc)
+        return ok(ScheduleEventSerializer(event).data, message='Jadwal bimbingan dimulai')
+
+
+class GuidanceCompleteView(_AuthView):
+    permission_classes = [IsDosen]
+
+    def post(self, request, schedule_id):
+        event = guidance_service.get_schedule(schedule_id)
+        if event is None:
+            return fail('Jadwal tidak ditemukan', status=http_status.HTTP_404_NOT_FOUND)
+        try:
+            event = guidance_service.complete_schedule(event)
+        except DomainError as exc:
+            return _domain_fail(exc)
+        return ok(ScheduleEventSerializer(event).data, message='Jadwal bimbingan diselesaikan')
+
+
+class GuidanceCancelView(_AuthView):
+    permission_classes = [IsMahasiswa | IsDosen]
+
+    def post(self, request, schedule_id):
+        event = guidance_service.get_schedule(schedule_id)
+        if event is None:
+            return fail('Jadwal tidak ditemukan', status=http_status.HTTP_404_NOT_FOUND)
+        try:
+            event = guidance_service.cancel_schedule(event)
+        except DomainError as exc:
+            return _domain_fail(exc)
+        return ok(ScheduleEventSerializer(event).data, message='Jadwal bimbingan dibatalkan')
+
+
+class GuidanceRescheduleView(_AuthView):
+    permission_classes = [IsMahasiswa | IsDosen]
+
+    def post(self, request, schedule_id):
+        event = guidance_service.get_schedule(schedule_id)
+        if event is None:
+            return fail('Jadwal tidak ditemukan', status=http_status.HTTP_404_NOT_FOUND)
+        payload = RescheduleSerializer(data=request.data)
+        if not payload.is_valid():
+            return fail('Data tidak valid', errors=payload.errors)
+        try:
+            event = guidance_service.reschedule(
+                event, payload.validated_data['date'], payload.validated_data['time'],
+            )
+        except DomainError as exc:
+            return _domain_fail(exc)
+        return ok(ScheduleEventSerializer(event).data, message='Jadwal bimbingan dijadwalkan ulang')
+
+
+class GuidanceByBimbinganView(_AuthView):
+    def get(self, request, bimbingan_aktif_id):
+        schedules = guidance_service.list_by_bimbingan(bimbingan_aktif_id)
+        return ok(ScheduleEventSerializer(schedules, many=True).data)
+
+
+class DefenseListCreateView(_AuthView):
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsKoordinator()]
+        return [IsAuthenticated()]
+
+    def get(self, request):
+        defenses = defense_service.list_defenses()
+        return ok(ScheduleEventSerializer(defenses, many=True).data)
+
+    def post(self, request):
+        payload = DefenseCreateSerializer(data=request.data)
+        if not payload.is_valid():
+            return fail('Data tidak valid', errors=payload.errors)
+        try:
+            defense = defense_service.create_defense(payload.validated_data)
+        except DomainError as exc:
+            return _domain_fail(exc)
+        return created(ScheduleEventSerializer(defense).data, message='Jadwal sidang dibuat')
+
+
+class DefenseDetailView(_AuthView):
+    def get_permissions(self):
+        if self.request.method in ('PUT', 'DELETE'):
+            return [IsKoordinator()]
+        return [IsAuthenticated()]
+
+    def get(self, request, defense_id):
+        defense = defense_service.get_defense(defense_id)
+        if defense is None:
+            return fail('Sidang tidak ditemukan', status=http_status.HTTP_404_NOT_FOUND)
+        return ok(ScheduleEventSerializer(defense).data)
+
+    def put(self, request, defense_id):
+        defense = defense_service.get_defense(defense_id)
+        if defense is None:
+            return fail('Sidang tidak ditemukan', status=http_status.HTTP_404_NOT_FOUND)
+        payload = DefenseUpdateSerializer(data=request.data)
+        if not payload.is_valid():
+            return fail('Data tidak valid', errors=payload.errors)
+        try:
+            defense = defense_service.update_defense(defense, payload.validated_data)
+        except DomainError as exc:
+            return _domain_fail(exc)
+        return ok(ScheduleEventSerializer(defense).data, message='Jadwal sidang diperbarui')
+
+    def delete(self, request, defense_id):
+        defense = defense_service.get_defense(defense_id)
+        if defense is None:
+            return fail('Sidang tidak ditemukan', status=http_status.HTTP_404_NOT_FOUND)
+        defense = defense_service.cancel_defense(defense)
+        return ok(ScheduleEventSerializer(defense).data, message='Jadwal sidang dibatalkan')
+
+
+class DefenseByStudentView(_AuthView):
+    def get(self, request, student_id):
+        defenses = defense_service.list_by_student(student_id)
+        return ok(ScheduleEventSerializer(defenses, many=True).data)

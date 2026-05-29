@@ -8,7 +8,10 @@ api = [
     path('archive/', include('apps.archive.urls')),
     path('topik/', include('apps.topik.urls')),
     path('pengajuan/', include('apps.pengajuan.urls')),
+<<<<<<< HEAD
     path('bimbingan/', include('apps.bimbingan.urls')),
+=======
+>>>>>>> Week-4-2272002-Joshua-Subianto
 ]
 
 urlpatterns = [
