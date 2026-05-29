@@ -3,25 +3,33 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
 import {
+  LayoutDashboard,
+  CheckSquare,
   BookOpen,
-  CalendarDays,
-  FileText,
   Bell,
   LogOut,
 } from "lucide-react";
+import api from "../api";
 
-export default function DashboardMahasiswa() {
-  const [nim, setNim] = useState("");
+export default function DashboardDosenLading() {
+  const [nama, setNama] = useState("Dosen");
   const router = useRouter();
 
   useEffect(() => {
-    const storedNim = localStorage.getItem("nim_nip");
-
-    if (storedNim) {
-      setNim(storedNim);
-    }
+    api.get("/auth/me/")
+      .then((res) => {
+        if (res.data.success) {
+          setNama(res.data.data.nama_lengkap);
+        }
+      })
+      .catch((err) => {
+        console.error("Gagal memuat profil dosen:", err);
+        const storedNip = localStorage.getItem("nim_nip");
+        if (storedNip) {
+          setNama(storedNip);
+        }
+      });
   }, []);
 
   const handleLogout = () => {
@@ -96,13 +104,115 @@ export default function DashboardMahasiswa() {
       >
         {/* Welcome */}
         <h1 className="text-5xl font-bold text-[#355872] mb-20">
-          Welcome, {nim}
+          Selamat Datang, {nama}
         </h1>
 
         {/* Cards */}
         <div className="flex items-center justify-center gap-10">
-          {/* TOPIK */}
-          <Link href="/mahasiswa/list-topik">
+          {/* DASHBOARD */}
+          <Link href="/dosen/dashboard">
+            <div
+              className="
+                w-72
+                h-72
+                rounded-3xl
+                bg-white
+                border
+                border-[#dbe9f4]
+                shadow-sm
+                hover:shadow-xl
+                hover:-translate-y-2
+                transition
+                flex
+                flex-col
+                items-center
+                justify-center
+                gap-8
+                cursor-pointer
+              "
+            >
+              {/* Icon */}
+              <div
+                className="
+                  w-28
+                  h-28
+                  rounded-3xl
+                  bg-[#EAF4FB]
+                  flex
+                  items-center
+                  justify-center
+                  text-[#355872]
+                "
+              >
+                <LayoutDashboard size={48} />
+              </div>
+
+              {/* Text */}
+              <div className="text-center">
+                <h2 className="text-4xl font-bold text-[#355872]">
+                  Dashboard
+                </h2>
+
+                <p className="text-gray-500 mt-3 text-lg">
+                  Monitoring bimbingan
+                </p>
+              </div>
+            </div>
+          </Link>
+
+          {/* APPROVAL */}
+          <Link href="/dosen/approval">
+            <div
+              className="
+                w-72
+                h-72
+                rounded-3xl
+                bg-white
+                border
+                border-[#dbe9f4]
+                shadow-sm
+                hover:shadow-xl
+                hover:-translate-y-2
+                transition
+                flex
+                flex-col
+                items-center
+                justify-center
+                gap-8
+                cursor-pointer
+              "
+            >
+              {/* Icon */}
+              <div
+                className="
+                  w-28
+                  h-28
+                  rounded-3xl
+                  bg-[#EAF4FB]
+                  flex
+                  items-center
+                  justify-center
+                  text-[#355872]
+                "
+              >
+                <CheckSquare size={48} />
+              </div>
+
+              {/* Text */}
+              <div className="text-center">
+                <h2 className="text-4xl font-bold text-[#355872]">
+                  Approval
+                </h2>
+
+                <p className="text-gray-500 mt-3 text-lg">
+                  Persetujuan bimbingan
+                </p>
+              </div>
+            </div>
+          </Link>
+
+          {/* PENAWARAN TOPIK */}
+          <Link href="/dosen/penawaran-topik">
             <div
               className="
                 w-72
@@ -146,109 +256,7 @@ export default function DashboardMahasiswa() {
                 </h2>
 
                 <p className="text-gray-500 mt-3 text-lg">
-                  Daftar topik KP
-                </p>
-              </div>
-            </div>
-          </Link>
-
-          {/* JADWAL */}
-          <Link href="/mahasiswa/jadwal-bimbingan">
-            <div
-              className="
-                w-72
-                h-72
-                rounded-3xl
-                bg-white
-                border
-                border-[#dbe9f4]
-                shadow-sm
-                hover:shadow-xl
-                hover:-translate-y-2
-                transition
-                flex
-                flex-col
-                items-center
-                justify-center
-                gap-8
-                cursor-pointer
-              "
-            >
-              {/* Icon */}
-              <div
-                className="
-                  w-28
-                  h-28
-                  rounded-3xl
-                  bg-[#EAF4FB]
-                  flex
-                  items-center
-                  justify-center
-                  text-[#355872]
-                "
-              >
-                <CalendarDays size={48} />
-              </div>
-
-              {/* Text */}
-              <div className="text-center">
-                <h2 className="text-4xl font-bold text-[#355872]">
-                  Jadwal
-                </h2>
-
-                <p className="text-gray-500 mt-3 text-lg">
-                  Jadwal bimbingan
-                </p>
-              </div>
-            </div>
-          </Link>
-
-          {/* LAPORAN */}
-          <Link href="/mahasiswa/upload-laporan">
-            <div
-              className="
-                w-72
-                h-72
-                rounded-3xl
-                bg-white
-                border
-                border-[#dbe9f4]
-                shadow-sm
-                hover:shadow-xl
-                hover:-translate-y-2
-                transition
-                flex
-                flex-col
-                items-center
-                justify-center
-                gap-8
-                cursor-pointer
-              "
-            >
-              {/* Icon */}
-              <div
-                className="
-                  w-28
-                  h-28
-                  rounded-3xl
-                  bg-[#EAF4FB]
-                  flex
-                  items-center
-                  justify-center
-                  text-[#355872]
-                "
-              >
-                <FileText size={48} />
-              </div>
-
-              {/* Text */}
-              <div className="text-center">
-                <h2 className="text-4xl font-bold text-[#355872]">
-                  Laporan
-                </h2>
-
-                <p className="text-gray-500 mt-3 text-lg">
-                  Kirim laporan KP
+                  Tawarkan topik baru
                 </p>
               </div>
             </div>

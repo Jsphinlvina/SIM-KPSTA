@@ -1,122 +1,221 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Sidebar from "@/app/components/sidebar";
-import api from "@/app/api";
+import { Check, X, Calendar, MessageSquare, AlertCircle } from "lucide-react";
 
 type Request = {
   id: number;
   student: string;
+  nim: string;
   date: string;
-  status: "pending" | "approved" | "rejected";
-  topic_title: string;
+  time: string;
+  notes: string;
+  status: "Pending" | "Disetujui" | "Ditolak";
 };
 
 export default function ApprovalPage() {
-  const [requests, setRequests] = useState<Request[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [isMounted, setIsMounted] = useState(false); // KUNCI 1: Jinakkan Hydration Mismatch
+  const [requests, setRequests] = useState<Request[]>([
+    {
+      id: 1,
+      student: "Andi Saputra",
+      nim: "2272001",
+      date: "12 Mei 2026",
+      time: "10:00 - 11:30 WIB",
+      notes: "Konsultasi draft laporan KP Bab 3 Metodologi Penelitian.",
+      status: "Pending",
+    },
+    {
+      id: 2,
+      student: "Budi Hartono",
+      nim: "2272002",
+      date: "15 Mei 2026",
+      time: "13:30 - 15:00 WIB",
+      notes: "Review revisi kuesioner evaluasi kurikulum akademik.",
+      status: "Pending",
+    },
+    {
+      id: 3,
+      student: "Citra Lestari",
+      nim: "2272003",
+      date: "18 Mei 2026",
+      time: "09:00 - 10:30 WIB",
+      notes: "Diskusi hasil rancangan arsitektur IoT dan database server.",
+      status: "Disetujui",
+    },
+  ]);
 
-  // Pastikan komponen sudah terpasang sepenuhnya di browser sebelum render Sidebar
-  useEffect(() => {
-    setIsMounted(true);
-    fetchRequests();
-  }, []);
-
-  const fetchRequests = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get("/schedule/requests/");
-      if (res.data && res.data.success) {
-        setRequests(res.data.data);
-      }
-    } catch (err) {
-      console.warn("API /schedule/requests/ belum siap di backend. Menggunakan fallback data kosong.");
-      setRequests([]); // KUNCI 2: Amankan agar data tidak crash 404
-    } finally {
-      setLoading(false);
-    }
+  const handleApprove = (id: number) => {
+    setRequests((prev) =>
+      prev.map((r) =>
+        r.id === id ? { ...r, status: "Disetujui" } : r
+      )
+    );
   };
 
-  const handleApprove = async (id: number) => {
-    try {
-      const res = await api.post(`/schedule/requests/${id}/approve/`);
-      if (res.data.success) {
-        alert("Bimbingan mahasiswa berhasil disetujui!");
-        setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: "approved" } : r)));
-      }
-    } catch (err) {
-      alert("Fungsi approve belum siap di backend, mengubah state lokal saja.");
-      setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: "approved" } : r)));
-    }
+  const handleReject = (id: number) => {
+    setRequests((prev) =>
+      prev.map((r) =>
+        r.id === id ? { ...r, status: "Ditolak" } : r
+      )
+    );
   };
-
-  const handleReject = async (id: number) => {
-    const alasan = prompt("Masukkan alasan penolakan:");
-    if (alasan === null) return;
-    try {
-      const res = await api.post(`/schedule/requests/${id}/reject/`, { alasan });
-      if (res.data.success) {
-        alert("Bimbingan ditolak.");
-        setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: "rejected" } : r)));
-      }
-    } catch (err) {
-      alert("Fungsi reject belum siap di backend, mengubah state lokal saja.");
-      setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: "rejected" } : r)));
-    }
-  };
-
-  // Jika belum mounted, tampilkan loading tipis agar HTML Server & Client sinkron
-  if (!isMounted) {
-    return <div className="min-h-screen bg-[#F7F8F0] p-10 text-center">Loading interface...</div>;
-  }
 
   return (
     <div className="flex min-h-screen bg-[#F7F8F0]">
       <Sidebar />
 
-      <div className="flex-1 p-10">
+      <div className="flex-1 p-10 flex flex-col">
+        {/* Header */}
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-[#355872]">Approval Bimbingan</h1>
-          <p className="text-gray-500 mt-2">Persetujuan draf judul dan penentuan jadwal KP/STA dari mahasiswa.</p>
+          <h1 className="text-3xl font-bold text-[#355872]">
+            Approval Bimbingan
+          </h1>
+          <p className="text-gray-500 mt-2 font-medium">
+            Evaluasi dan persetujuan pengajuan jadwal bimbingan tatap muka mahasiswa Kerja Praktik
+          </p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-sm border border-[#e6eef5] p-8">
-          <h2 className="text-xl font-bold text-[#355872] mb-6">Daftar Pengajuan Masuk</h2>
+        {/* Card Table Container */}
+        <div className="bg-white rounded-3xl shadow-sm border border-[#e6eef5] overflow-hidden flex-1">
+          <div className="px-8 py-6 border-b border-[#f0f5fa]">
+            <h2 className="text-xl font-bold text-[#355872]">
+              Daftar Pengajuan Jadwal
+            </h2>
+            <p className="text-sm text-gray-500 mt-1 font-medium">
+              Silakan evaluasi dan tentukan keputusan persetujuan untuk pengajuan di bawah ini.
+            </p>
+          </div>
 
-          {loading && requests.length === 0 ? (
-            <p className="text-center text-gray-500 py-4 animate-pulse">Menghubungkan ke PostgreSQL...</p>
-          ) : requests.length === 0 ? (
-            <p className="text-center text-gray-400 py-6">Belum ada mahasiswa yang mengajukan bimbingan kepada Anda.</p>
-          ) : (
-            <div className="space-y-4">
-              {requests.map((r, i) => (
-                <div key={r.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-white border border-[#e6eef5] rounded-2xl px-5 py-4 gap-4">
-                  <div className="flex items-start gap-4">
-                    <span className="font-semibold text-[#355872] mt-0.5">{i + 1}.</span>
-                    <div>
-                      <p className="font-semibold text-[#355872] text-lg">{r.student}</p>
-                      <p className="text-sm font-medium text-gray-700 italic mt-0.5">"{r.topic_title}"</p>
-                      <p className="text-xs text-gray-400 mt-1">Diajukan pada: <span className="font-medium">{r.date}</span></p>
-                    </div>
-                  </div>
+          {/* Table Headers */}
+          <div
+            className="grid grid-cols-12 gap-4 bg-[#EAF4FB] px-8 py-4 font-semibold text-[#355872] text-sm border-b border-[#e6eef5]"
+          >
+            <div className="col-span-1">No</div>
+            <div className="col-span-3">Mahasiswa</div>
+            <div className="col-span-3">Waktu Pertemuan</div>
+            <div className="col-span-3">Perihal / Catatan</div>
+            <div className="col-span-2 text-right pr-4">Keputusan</div>
+          </div>
 
-                  <div className="flex items-center gap-2 self-end sm:self-center">
-                    {r.status === "pending" ? (
-                      <div className="flex gap-2">
-                        <button onClick={() => handleApprove(r.id)} className="px-4 py-1.5 rounded-xl bg-green-100 text-green-700 font-medium text-sm hover:bg-green-200 transition">Setujui</button>
-                        <button onClick={() => handleReject(r.id)} className="px-4 py-1.5 rounded-xl bg-red-100 text-red-700 font-medium text-sm hover:bg-red-200 transition">Tolak</button>
-                      </div>
-                    ) : (
-                      <span className={`px-4 py-1 rounded-full text-xs font-semibold uppercase ${r.status === "approved" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                        {r.status === "approved" ? "Disetujui" : "Ditolak"}
-                      </span>
-                    )}
-                  </div>
+          {/* Table Body */}
+          <div className="divide-y divide-[#eef4f8]">
+            {requests.map((r, i) => (
+              <div
+                key={r.id}
+                className="grid grid-cols-12 gap-4 px-8 py-5 items-center hover:bg-[#F7F8F0]/30 transition"
+              >
+                {/* 1. Index */}
+                <div className="col-span-1 text-[#355872] font-semibold text-lg">
+                  {i + 1}
                 </div>
-              ))}
-            </div>
-          )}
+
+                {/* 2. Student Profile */}
+                <div className="col-span-3">
+                  <p className="font-bold text-[#355872] text-lg">{r.student}</p>
+                  <p className="text-sm text-gray-500 font-medium mt-0.5">NIM: {r.nim}</p>
+                </div>
+
+                {/* 3. Date & Time */}
+                <div className="col-span-3">
+                  <div className="flex items-center gap-2 text-[#355872] font-bold text-sm">
+                    <Calendar size={14} className="text-gray-400" />
+                    <span>{r.date}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 font-medium mt-1 pl-5.5">{r.time}</p>
+                </div>
+
+                {/* 4. Notes */}
+                <div className="col-span-3 flex items-start gap-2 pr-4">
+                  <MessageSquare size={14} className="text-gray-400 mt-1 shrink-0" />
+                  <p className="text-sm text-[#355872] font-medium leading-relaxed">
+                    {r.notes}
+                  </p>
+                </div>
+
+                {/* 5. Action / Status Badge */}
+                <div className="col-span-2 flex items-center justify-end pr-2 gap-2">
+                  {r.status === "Pending" ? (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleApprove(r.id)}
+                        className="
+                          flex
+                          items-center
+                          gap-1
+                          px-3
+                          py-2
+                          rounded-xl
+                          bg-green-50
+                          hover:bg-green-600
+                          text-green-700
+                          hover:text-white
+                          border
+                          border-green-100
+                          text-xs
+                          font-bold
+                          transition-all
+                          duration-200
+                          cursor-pointer
+                        "
+                      >
+                        <Check size={14} />
+                        Setujui
+                      </button>
+
+                      <button
+                        onClick={() => handleReject(r.id)}
+                        className="
+                          flex
+                          items-center
+                          gap-1
+                          px-3
+                          py-2
+                          rounded-xl
+                          bg-red-50
+                          hover:bg-red-600
+                          text-red-700
+                          hover:text-white
+                          border
+                          border-red-100
+                          text-xs
+                          font-bold
+                          transition-all
+                          duration-200
+                          cursor-pointer
+                        "
+                      >
+                        <X size={14} />
+                        Tolak
+                      </button>
+                    </div>
+                  ) : (
+                    <span
+                      className={`
+                        inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border
+                        ${
+                          r.status === "Disetujui"
+                            ? "bg-green-50 text-green-700 border-green-100"
+                            : "bg-red-50 text-red-700 border-red-100"
+                        }
+                      `}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        r.status === "Disetujui" ? "bg-green-500" : "bg-red-500"
+                      }`}></span>
+                      {r.status}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {requests.length === 0 && (
+              <div className="px-6 py-12 text-center text-gray-500 font-medium">
+                Tidak ada pengajuan jadwal bimbingan yang masuk.
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

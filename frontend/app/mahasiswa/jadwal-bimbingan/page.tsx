@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import "react-calendar/dist/Calendar.css";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import Sidebar from "@/app/components/sidebar";
 
 const Calendar = dynamic(
   () => import("react-calendar"),
@@ -24,7 +25,9 @@ export default function JadwalBimbinganPage() {
   };
 
   return (
-    <div className="w-full py-10 flex flex-col">
+    <div className="flex min-h-screen bg-[#F7F8F0]">
+      <Sidebar />
+      <div className="flex-1 p-10 flex flex-col">
       
       {/* Header */}
       <div className="flex items-start justify-between mb-10">
@@ -287,6 +290,7 @@ export default function JadwalBimbinganPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

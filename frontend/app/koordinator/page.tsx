@@ -3,25 +3,33 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
 import {
-  BookOpen,
-  CalendarDays,
+  Award,
+  Users,
   FileText,
   Bell,
   LogOut,
 } from "lucide-react";
+import api from "../api";
 
-export default function DashboardMahasiswa() {
-  const [nim, setNim] = useState("");
+export default function DashboardKoordinatorLanding() {
+  const [nama, setNama] = useState("Koordinator");
   const router = useRouter();
 
   useEffect(() => {
-    const storedNim = localStorage.getItem("nim_nip");
-
-    if (storedNim) {
-      setNim(storedNim);
-    }
+    api.get("/auth/me/")
+      .then((res) => {
+        if (res.data.success) {
+          setNama(res.data.data.nama_lengkap);
+        }
+      })
+      .catch((err) => {
+        console.error("Gagal memuat profil koordinator:", err);
+        const storedNip = localStorage.getItem("nim_nip");
+        if (storedNip) {
+          setNama(storedNip);
+        }
+      });
   }, []);
 
   const handleLogout = () => {
@@ -96,13 +104,13 @@ export default function DashboardMahasiswa() {
       >
         {/* Welcome */}
         <h1 className="text-5xl font-bold text-[#355872] mb-20">
-          Welcome, {nim}
+          Selamat Datang, {nama}
         </h1>
 
         {/* Cards */}
         <div className="flex items-center justify-center gap-10">
-          {/* TOPIK */}
-          <Link href="/mahasiswa/list-topik">
+          {/* PENENTUAN PEMBIMBING */}
+          <Link href="/koordinator/penentuan-pembimbing">
             <div
               className="
                 w-72
@@ -136,24 +144,24 @@ export default function DashboardMahasiswa() {
                   text-[#355872]
                 "
               >
-                <BookOpen size={48} />
+                <Award size={48} />
               </div>
 
               {/* Text */}
               <div className="text-center">
                 <h2 className="text-4xl font-bold text-[#355872]">
-                  Topik
+                  Pembimbing
                 </h2>
 
                 <p className="text-gray-500 mt-3 text-lg">
-                  Daftar topik KP
+                  Alokasi pembimbing
                 </p>
               </div>
             </div>
           </Link>
 
-          {/* JADWAL */}
-          <Link href="/mahasiswa/jadwal-bimbingan">
+          {/* BEBAN KERJA DOSEN */}
+          <Link href="/koordinator/distribusi">
             <div
               className="
                 w-72
@@ -187,24 +195,24 @@ export default function DashboardMahasiswa() {
                   text-[#355872]
                 "
               >
-                <CalendarDays size={48} />
+                <Users size={48} />
               </div>
 
               {/* Text */}
               <div className="text-center">
                 <h2 className="text-4xl font-bold text-[#355872]">
-                  Jadwal
+                  Distribusi
                 </h2>
 
                 <p className="text-gray-500 mt-3 text-lg">
-                  Jadwal bimbingan
+                  Beban kerja dosen
                 </p>
               </div>
             </div>
           </Link>
 
-          {/* LAPORAN */}
-          <Link href="/mahasiswa/upload-laporan">
+          {/* LAPORAN KELULUSAN */}
+          <Link href="/koordinator/laporan">
             <div
               className="
                 w-72
@@ -248,7 +256,7 @@ export default function DashboardMahasiswa() {
                 </h2>
 
                 <p className="text-gray-500 mt-3 text-lg">
-                  Kirim laporan KP
+                  Statistik & kelulusan
                 </p>
               </div>
             </div>

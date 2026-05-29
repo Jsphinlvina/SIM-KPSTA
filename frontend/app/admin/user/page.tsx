@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
-import ModalAdd from "./modal-add";
 import Link from "next/link";
-import { Upload, ArrowLeft } from "lucide-react";
+import { Plus, Upload, ArrowLeft } from "lucide-react";
+import ModalAdd from "./modal-add";
+import Sidebar from "@/app/components/sidebar";
 
 export default function UserPage() {
   const [openModal, setOpenModal] = useState(false);
@@ -28,7 +28,9 @@ export default function UserPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F7F8F0] p-10">
+    <div className="flex min-h-screen bg-[#F7F8F0]">
+      <Sidebar />
+      <div className="flex-1 p-10 flex flex-col">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4 mb-10">
@@ -187,6 +189,7 @@ export default function UserPage() {
         openModal={openModal}
         setOpenModal={setOpenModal}
       />
+      </div>
     </div>
   );
 }

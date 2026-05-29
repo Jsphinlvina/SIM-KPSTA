@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
-import { User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { User, LogOut } from "lucide-react";
 
 export default function DashboardAdmin() {
   const [admin, setAdmin] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const storedAdmin = localStorage.getItem("nim_nip");
@@ -16,8 +17,42 @@ export default function DashboardAdmin() {
     }
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("nim_nip");
+    router.push("/login");
+  };
+
   return (
     <div className="relative min-h-screen w-full bg-[#F7F8F0]">
+      {/* Top Actions */}
+      <div className="absolute top-10 right-10 flex gap-4">
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          className="
+            px-5
+            h-14
+            rounded-2xl
+            bg-white
+            border
+            border-red-100
+            shadow-sm
+            flex
+            items-center
+            justify-center
+            gap-2
+            text-red-500
+            hover:bg-red-50
+            transition
+            cursor-pointer
+            font-semibold
+          "
+        >
+          <LogOut size={20} />
+          <span>Keluar</span>
+        </button>
+      </div>
       {/* CENTER CONTENT */}
       <div
         className="
