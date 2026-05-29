@@ -36,6 +36,8 @@ export default function LoginPage() {
           router.push("/mahasiswa");
         } else if (user.role === "dosen") {
           router.push("/dosen/dashboard");
+        }  else if (user.role === "admin") {
+          router.push("/admin");
         } else {
           router.push("/");
         }
