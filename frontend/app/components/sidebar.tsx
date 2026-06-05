@@ -311,7 +311,6 @@ function SidebarContent({ role }: { role: SidebarRole }) {
           "
         >
           <LogOut size={16} />
-          <span>Keluar</span>
         </button>
       </div>
     </div>

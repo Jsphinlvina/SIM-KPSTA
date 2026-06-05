@@ -19,34 +19,58 @@ export default function UploadLaporanPage() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#F7F8F0]">
-      <Sidebar />
+    <div className="w-screen min-h-screen bg-[#F7F8F0]">
+      {/* <Sidebar /> */}
       <div className="flex-1 p-10 flex flex-col">
       
       {/* Header */}
-      <div className="flex items-start gap-4 mb-10">
-        <Link 
-          href="/mahasiswa" 
+      <div className="flex items-start justify-between mb-10">
+        <div className="flex items-start gap-4">
+          <Link
+            href="/mahasiswa"
+            className="mt-1 p-2 rounded-full hover:bg-[#EAF4FB] transition text-[#355872]"
+          >
+            <ArrowLeft size={32} />
+          </Link>
+
+          <div>
+            <h1 className="text-4xl font-bold text-[#355872]">
+              Kirim Laporan
+            </h1>
+
+            <p className="text-gray-500 mt-2">
+              Kirim Laporan Kerja Praktik
+            </p>
+          </div>
+        </div>
+
+        <label
           className="
-            mt-1 
-            p-2 
-            rounded-full 
-            hover:bg-[#EAF4FB] 
-            transition 
-            text-[#355872]
+            flex
+            items-center
+            gap-2
+            px-5
+            py-3
+            rounded-xl
+            bg-[#355872]
+            hover:bg-[#7AAACE]
+            text-white
+            transition
+            cursor-pointer
+            shrink-0
           "
         >
-          <ArrowLeft size={32} />
-        </Link>
+          <Upload size={18} />
 
-        <div>
-          <h1 className="text-4xl font-bold text-[#355872]">
-            Kirim Laporan 
-          </h1>
-          <p className="text-gray-500 mt-2">
-            Kirim Laporan Kerja Praktik
-          </p>
-        </div>
+          <span className="font-medium">
+            Upload
+          </span>
+
+          <input
+            type="file"
+            className="hidden"
+          />
+        </label>
       </div>
 
       {/* Card */}
@@ -75,33 +99,6 @@ export default function UploadLaporanPage() {
             <span className="text-gray-500">
               Topik dosen
             </span>
-
-            <label
-              className="
-                flex
-                items-center
-                gap-2
-                px-5
-                py-3
-                rounded-xl
-                bg-[#355872]
-                hover:bg-[#7AAACE]
-                text-white
-                transition
-                cursor-pointer
-              "
-            >
-              <Upload size={18} />
-
-              <span className="font-medium">
-                Upload
-              </span>
-
-              <input
-                type="file"
-                className="hidden"
-              />
-            </label>
           </div>
         </div>
 

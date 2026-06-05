@@ -66,19 +66,12 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleLogin} className="w-full flex flex-col gap-6">
-          {/* Username */}
+        <form className="w-full flex flex-col gap-6">
+          
           <div className="relative">
-            <User
-              size={20}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-[#355872]"
-            />
-
             <input
               type="text"
-              placeholder="NRP / NIM"
-              value ={nimNip}
-              onChange={(e)=>setNimNip(e.target.value)}
+              placeholder="Isi Email"
               className="
                 w-full
                 h-12
@@ -86,7 +79,7 @@ export default function LoginPage() {
                 border
                 border-[#355872]
                 bg-white
-                pl-12
+                pl-6
                 pr-4
                 outline-none
                 text-[#355872]
@@ -99,13 +92,31 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Password */}
           <div className="relative">
-            <Lock
-              size={20}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-[#355872]"
+            <input
+              type="text"
+              placeholder="Isi Nama Lengkap"
+              className="
+                w-full
+                h-12
+                rounded-full
+                border
+                border-[#355872]
+                bg-white
+                pl-6
+                pr-4
+                outline-none
+                text-[#355872]
+                placeholder:text-gray-500
+                focus:border-[#7AAACE]
+                focus:ring-2
+                focus:ring-[#355872]
+                transition
+              "
             />
+          </div>
 
+          <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
@@ -118,8 +129,8 @@ export default function LoginPage() {
                 border
                 border-[#355872]
                 bg-white
-                pl-12
-                pr-12
+                pl-6
+                pr-5
                 outline-none
                 text-[#355872]
                 placeholder:text-gray-500
@@ -129,30 +140,8 @@ export default function LoginPage() {
                 transition
               "
             />
-
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#355872]"
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
           </div>
 
-          {/* <div className="flex justify-end -mt-3">
-            <button
-              type="button"
-              onClick={() => router.push("/forgot-password")}
-              className="
-                text-sm
-                text-[#355872]
-                hover:text-[#7AAACE]
-                transition
-              "
-            >
-              Lupa Password?
-            </button>
-          </div> */}
 
           {/* Button */}
           <button
@@ -169,29 +158,30 @@ export default function LoginPage() {
               shadow-md
             "
           >
-            Login
+            Daftar
           </button>
+        </form>
 
-          <div className="text-center">
+        
+          <div className="text-center mt-5">
             <span className="text-gray-600">
-              Belum punya akun?
+              Kembali ke
             </span>
 
             <button
               type="button"
-              onClick={() => router.push("/register")}
+              onClick={() => router.push("/login")}
               className="
-                ml-2
+                ml-1
                 text-[#355872]
                 font-semibold
                 hover:text-[#7AAACE]
                 transition
               "
             >
-              Daftar
+              login
             </button>
           </div>
-        </form>
       </div>
     </div>
   );

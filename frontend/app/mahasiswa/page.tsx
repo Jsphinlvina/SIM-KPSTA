@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import NotificationPopup from "./notifikasi/page";
 
 import {
   BookOpen,
@@ -15,6 +16,7 @@ import {
 export default function DashboardMahasiswa() {
   const [nim, setNim] = useState("");
   const router = useRouter();
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
     const storedNim = localStorage.getItem("nim_nip");
@@ -33,9 +35,12 @@ export default function DashboardMahasiswa() {
   return (
     <div className="relative min-h-screen w-full bg-[#F7F8F0]">
       {/* Top Actions */}
-      <div className="absolute top-10 right-10 flex gap-4">
+      <div className="absolute top-10 right-10 flex gap-4 z-50">
         {/* Notification */}
         <button
+          onClick={() =>
+            setShowNotification(!showNotification)
+          }
           className="
             w-14
             h-14
@@ -79,9 +84,16 @@ export default function DashboardMahasiswa() {
           "
         >
           <LogOut size={20} />
-          <span>Keluar</span>
         </button>
       </div>
+
+      {showNotification && (
+        <NotificationPopup
+          onClose={() =>
+            setShowNotification(false)
+          }
+        />
+      )}
 
       {/* CENTER CONTENT */}
       <div

@@ -87,7 +87,6 @@ export default function DashboardDosenLading() {
           "
         >
           <LogOut size={20} />
-          <span>Keluar</span>
         </button>
       </div>
 
@@ -104,7 +103,7 @@ export default function DashboardDosenLading() {
       >
         {/* Welcome */}
         <h1 className="text-5xl font-bold text-[#355872] mb-20">
-          Selamat Datang, {nama}
+          Welcome, {nama}
         </h1>
 
         {/* Cards */}

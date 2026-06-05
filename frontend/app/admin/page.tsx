@@ -26,7 +26,7 @@ export default function DashboardAdmin() {
   return (
     <div className="relative min-h-screen w-full bg-[#F7F8F0]">
       {/* Top Actions */}
-      <div className="absolute top-10 right-10 flex gap-4">
+      <div className="absolute top-10 right-10 flex gap-4 z-50">
         {/* Logout */}
         <button
           onClick={handleLogout}
@@ -50,7 +50,6 @@ export default function DashboardAdmin() {
           "
         >
           <LogOut size={20} />
-          <span>Keluar</span>
         </button>
       </div>
       {/* CENTER CONTENT */}

@@ -25,271 +25,270 @@ export default function JadwalBimbinganPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F7F8F0]">
-      <Sidebar />
+    <div className="w-screen min-h-screen bg-[#F7F8F0]">
+
       <div className="flex-1 p-10 flex flex-col">
       
-      {/* Header */}
-      <div className="flex items-start justify-between mb-10">
+        <div className="flex items-start justify-between mb-10">
 
-        <div className="flex items-start gap-4">
-          <Link 
-            href="/mahasiswa" 
-            className="
-              mt-1 
-              p-2 
-              rounded-full 
-              hover:bg-[#EAF4FB] 
-              transition 
-              text-[#355872]
-            "
-          >
-            <ArrowLeft size={32} />
-          </Link>
-
-          <div>
-            <h1 className="text-3xl font-bold text-[#355872]">
-              Jadwal Bimbingan
-            </h1>
-            <p className="text-gray-500 mt-2">
-              Pilih jadwal bimbingan yang tersedia
-            </p>
-          </div>
-        </div>
-
-        <div className="text-[#355872] font-medium mt-2">
-          Dosen Pembimbing :
-          <span className="ml-2 text-gray-600">
-            Budi Santoso, S.Kom, M.T
-          </span>
-        </div>
-      </div>
-
-      <div
-        className="
-          bg-white
-          rounded-3xl
-          shadow-sm
-          border
-          border-[#e6eef5]
-          p-8
-        "
-      >
-        <div className="grid grid-cols-3 gap-8">
-          {/* Calendar */}
-          <div className="col-span-2">
-            <Calendar
-              onChange={handleDateClick}
-              value={date}
+          <div className="flex items-start gap-4">
+            <Link 
+              href="/mahasiswa" 
               className="
-                w-full
-                border-none
-                rounded-2xl
+                mt-1 
+                p-2 
+                rounded-full 
+                hover:bg-[#EAF4FB] 
+                transition 
+                text-[#355872]
               "
-            />
-          </div>
+            >
+              <ArrowLeft size={32} />
+            </Link>
 
-          {/* Riwayat */}
-          <div
-            className="
-              bg-[#EAF4FB]
-              rounded-2xl
-              border
-              border-[#e6eef5]
-              p-6
-              h-fit
-            "
-          >
-            <h2 className="text-xl font-bold text-[#355872] mb-6">
-              Riwayat Bimbingan
-            </h2>
-
-            <div className="space-y-3">
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-between
-                  bg-white
-                  rounded-2xl
-                  px-5
-                  py-4
-                  border
-                  border-[#e6eef5]
-                "
-              >
-                <div className="flex items-center gap-3">
-                  <span className="font-semibold text-[#355872]">
-                    1.
-                  </span>
-                  <span className="text-gray-700">
-                    2 Maret 2026
-                  </span>
-                </div>
-                <span
-                  className="
-                    px-3
-                    py-1
-                    rounded-full
-                    text-xs
-                    bg-green-100
-                    text-green-700
-                  "
-                >
-                  Disetujui
-                </span>
-              </div>
-
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-between
-                  bg-white
-                  rounded-2xl
-                  px-5
-                  py-4
-                  border
-                  border-[#e6eef5]
-                "
-              >
-                <div className="flex items-center gap-3">
-                  <span className="font-semibold text-[#355872]">
-                    2.
-                  </span>
-                  <span className="text-gray-700">
-                    11 April 2026
-                  </span>
-                </div>
-                <span
-                  className="
-                    px-3
-                    py-1
-                    rounded-full
-                    text-xs
-                    bg-yellow-100
-                    text-yellow-700
-                  "
-                >
-                  Pending
-                </span>
-              </div>
-
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-between
-                  bg-white
-                  rounded-2xl
-                  px-5
-                  py-4
-                  border
-                  border-[#e6eef5]
-                "
-              >
-                <div className="flex items-center gap-3">
-                  <span className="font-semibold text-[#355872]">
-                    3.
-                  </span>
-                  <span className="text-gray-700">
-                    18 April 2026
-                  </span>
-                </div>
-                <span
-                  className="
-                    px-3
-                    py-1
-                    rounded-full
-                    text-xs
-                    bg-red-100
-                    text-red-700
-                  "
-                >
-                  Ditolak
-                </span>
-              </div>
+            <div>
+              <h1 className="text-3xl font-bold text-[#355872]">
+                Jadwal Bimbingan
+              </h1>
+              <p className="text-gray-500 mt-2">
+                Pilih jadwal bimbingan yang tersedia
+              </p>
             </div>
           </div>
-        </div>
-      </div>
 
-      {openModal && (
+          <div className="text-[#355872] font-medium mt-2">
+            Dosen Pembimbing :
+            <span className="ml-2 text-gray-600">
+              Budi Santoso, S.Kom, M.T
+            </span>
+          </div>
+        </div>
+
         <div
           className="
-            fixed
-            inset-0
-            bg-black/40
-            backdrop-blur-sm
-            flex
-            items-center
-            justify-center
-            z-50
+            bg-white
+            rounded-3xl
+            shadow-sm
+            border
+            border-[#e6eef5]
+            p-8
           "
         >
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
-            <h2 className="text-xl font-bold text-[#355872] mb-4">
-              Pengajuan Bimbingan
-            </h2>
+          <div className="grid grid-cols-3 gap-8">
+            {/* Calendar */}
+            <div className="col-span-2">
+              <Calendar
+                onChange={handleDateClick}
+                value={date}
+                className="
+                  w-full
+                  border-none
+                  rounded-2xl
+                "
+              />
+            </div>
 
-            <p className="text-gray-600 mb-8">
-              Ajukan bimbingan pada tanggal:
-            </p>
-
+            {/* Riwayat */}
             <div
               className="
                 bg-[#EAF4FB]
-                text-[#355872]
                 rounded-2xl
-                px-5
-                py-4
-                font-semibold
-                mb-8
+                border
+                border-[#e6eef5]
+                p-6
+                h-fit
               "
             >
-              {date instanceof Date
-                ? date.toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })
-                : ""}
-            </div>
+              <h2 className="text-xl font-bold text-[#355872] mb-6">
+                Riwayat Bimbingan
+              </h2>
 
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setOpenModal(false)}
-                className="
-                  px-5
-                  py-2
-                  rounded-xl
-                  border
-                  border-[#dbe9f4]
-                  text-gray-600
-                  hover:bg-gray-100
-                  transition
-                "
-              >
-                Tidak
-              </button>
+              <div className="space-y-3">
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                    bg-white
+                    rounded-2xl
+                    px-5
+                    py-4
+                    border
+                    border-[#e6eef5]
+                  "
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="font-semibold text-[#355872]">
+                      1.
+                    </span>
+                    <span className="text-gray-700">
+                      2 Maret 2026
+                    </span>
+                  </div>
+                  <span
+                    className="
+                      px-3
+                      py-1
+                      rounded-full
+                      text-xs
+                      bg-green-100
+                      text-green-700
+                    "
+                  >
+                    Disetujui
+                  </span>
+                </div>
 
-              <button
-                className="
-                  px-5
-                  py-2
-                  rounded-xl
-                  bg-[#355872]
-                  hover:bg-[#7AAACE]
-                  text-white
-                  transition
-                "
-              >
-                Ya
-              </button>
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                    bg-white
+                    rounded-2xl
+                    px-5
+                    py-4
+                    border
+                    border-[#e6eef5]
+                  "
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="font-semibold text-[#355872]">
+                      2.
+                    </span>
+                    <span className="text-gray-700">
+                      11 April 2026
+                    </span>
+                  </div>
+                  <span
+                    className="
+                      px-3
+                      py-1
+                      rounded-full
+                      text-xs
+                      bg-yellow-100
+                      text-yellow-700
+                    "
+                  >
+                    Pending
+                  </span>
+                </div>
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                    bg-white
+                    rounded-2xl
+                    px-5
+                    py-4
+                    border
+                    border-[#e6eef5]
+                  "
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="font-semibold text-[#355872]">
+                      3.
+                    </span>
+                    <span className="text-gray-700">
+                      18 April 2026
+                    </span>
+                  </div>
+                  <span
+                    className="
+                      px-3
+                      py-1
+                      rounded-full
+                      text-xs
+                      bg-red-100
+                      text-red-700
+                    "
+                  >
+                    Ditolak
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      )}
+
+        {openModal && (
+          <div
+            className="
+              fixed
+              inset-0
+              bg-black/40
+              backdrop-blur-sm
+              flex
+              items-center
+              justify-center
+              z-50
+            "
+          >
+            <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+              <h2 className="text-xl font-bold text-[#355872] mb-4">
+                Pengajuan Bimbingan
+              </h2>
+
+              <p className="text-gray-600 mb-8">
+                Ajukan bimbingan pada tanggal:
+              </p>
+
+              <div
+                className="
+                  bg-[#EAF4FB]
+                  text-[#355872]
+                  rounded-2xl
+                  px-5
+                  py-4
+                  font-semibold
+                  mb-8
+                "
+              >
+                {date instanceof Date
+                  ? date.toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })
+                  : ""}
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setOpenModal(false)}
+                  className="
+                    px-5
+                    py-2
+                    rounded-xl
+                    border
+                    border-[#dbe9f4]
+                    text-gray-600
+                    hover:bg-gray-100
+                    transition
+                  "
+                >
+                  Tidak
+                </button>
+
+                <button
+                  className="
+                    px-5
+                    py-2
+                    rounded-xl
+                    bg-[#355872]
+                    hover:bg-[#7AAACE]
+                    text-white
+                    transition
+                  "
+                >
+                  Ya
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

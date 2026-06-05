@@ -152,8 +152,8 @@ export default function ListTopikPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F7F8F0]">
-      <Sidebar />
+    <div className="w-screen min-h-screen bg-[#F7F8F0]">
+      {/* <Sidebar /> */}
       <div className="flex-1 p-10 flex flex-col">
       
       {/* Header */}
@@ -179,7 +179,7 @@ export default function ListTopikPage() {
               Daftar Topik Kerja Praktik
             </h1>
             <p className="text-gray-500 mt-2 font-medium">
-              {activeTab === "topik" ? "Jelajahi dan pilih topik dari dosen pembimbing" : "Pantau riwayat status pengajuan judul Anda"}
+              {activeTab === "topik" ? "Pilih topik dari dosen pembimbing" : "Riwayat status pengajuan topik mandiri"}
             </p>
           </div>
         </div>

@@ -2,8 +2,9 @@
 
 import Sidebar from "@/app/components/sidebar";
 import { useEffect, useState } from "react";
-import { Users, Clock, BookOpen, CheckCircle2 } from "lucide-react";
+import { Users, Clock, BookOpen, CheckCircle2, ArrowLeft } from "lucide-react";
 import api from "@/app/api";
+import Link from "next/link";
 
 type Student = {
   id: number;
@@ -65,26 +66,41 @@ export default function DashboardDosenPage() {
 
   return (
     <div className="flex min-h-screen bg-[#F7F8F0]">
-      {/* Sidebar */}
-      <Sidebar />
+      {/* <Sidebar /> */}
 
-      {/* Content */}
       <div className="flex-1 p-10 flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between mb-10">
-          <div>
-            <h1 className="text-3xl font-bold text-[#355872]">
-              Dashboard Dosen
-            </h1>
-            <p className="text-gray-500 mt-2 font-medium">
-              Pemantauan beban dan status bimbingan mahasiswa Kerja Praktik
-            </p>
+          <div className="flex items-start gap-4">
+            <Link
+              href="/admin"
+              className="
+                mt-1
+                p-2
+                rounded-full
+                hover:bg-[#EAF4FB]
+                transition
+                text-[#355872]
+              "
+            >
+              <ArrowLeft size={32} />
+            </Link>
+
+            <div>
+              <h1 className="text-3xl font-bold text-[#355872]">
+                Dashboard Dosen
+              </h1>
+              <p className="text-gray-500 mt-2 font-medium">
+                Pemantauan beban dan status bimbingan mahasiswa Kerja Praktik
+              </p>
+            </div>
           </div>
 
           <div className="text-[#355872] font-bold bg-[#EAF4FB] px-5 py-3 rounded-2xl border border-[#9CD5FF]/20 shadow-sm text-sm">
             Dosen Pembimbing: <span className="text-gray-600 ml-1 font-semibold">{dosenProfile ? dosenProfile.nama_lengkap : "Memuat..."}</span>
           </div>
         </div>
+
 
         {/* Statistics Cards Row */}
         <div className="grid grid-cols-3 gap-6 mb-10">

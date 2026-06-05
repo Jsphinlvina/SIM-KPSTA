@@ -11,10 +11,12 @@ import {
   LogOut,
 } from "lucide-react";
 import api from "../api";
+import NotificationPopup from "./notifikasi/page";
 
 export default function DashboardKoordinatorLanding() {
   const [nama, setNama] = useState("Koordinator");
   const router = useRouter();
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
     api.get("/auth/me/")
@@ -41,9 +43,12 @@ export default function DashboardKoordinatorLanding() {
   return (
     <div className="relative min-h-screen w-full bg-[#F7F8F0]">
       {/* Top Actions */}
-      <div className="absolute top-10 right-10 flex gap-4">
+      <div className="absolute top-10 right-10 flex gap-4 z-50">
         {/* Notification */}
         <button
+          onClick={() =>
+            setShowNotification(!showNotification)
+          }
           className="
             w-14
             h-14
@@ -87,9 +92,17 @@ export default function DashboardKoordinatorLanding() {
           "
         >
           <LogOut size={20} />
-          <span>Keluar</span>
+
         </button>
       </div>
+
+      {showNotification && (
+        <NotificationPopup
+          onClose={() =>
+            setShowNotification(false)
+          }
+        />
+      )}
 
       {/* CENTER CONTENT */}
       <div
@@ -104,7 +117,7 @@ export default function DashboardKoordinatorLanding() {
       >
         {/* Welcome */}
         <h1 className="text-5xl font-bold text-[#355872] mb-20">
-          Selamat Datang, {nama}
+          Welcome, {nama}
         </h1>
 
         {/* Cards */}
@@ -161,7 +174,7 @@ export default function DashboardKoordinatorLanding() {
           </Link>
 
           {/* BEBAN KERJA DOSEN */}
-          <Link href="/koordinator/distribusi">
+          <Link href="/koordinator/distribusi-dosen">
             <div
               className="
                 w-72

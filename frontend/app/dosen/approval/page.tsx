@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Sidebar from "@/app/components/sidebar";
-import { Check, X, Calendar, MessageSquare, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { Check, X, Calendar, MessageSquare, AlertCircle, ArrowLeft } from "lucide-react";
 
 type Request = {
   id: number;
@@ -63,17 +64,33 @@ export default function ApprovalPage() {
 
   return (
     <div className="flex min-h-screen bg-[#F7F8F0]">
-      <Sidebar />
+      {/* <Sidebar /> */}
 
       <div className="flex-1 p-10 flex flex-col">
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold text-[#355872]">
-            Approval Bimbingan
-          </h1>
-          <p className="text-gray-500 mt-2 font-medium">
-            Evaluasi dan persetujuan pengajuan jadwal bimbingan tatap muka mahasiswa Kerja Praktik
-          </p>
+        <div className="flex items-start gap-4 mb-10">
+          <Link
+            href="/mahasiswa"
+            className="
+              mt-1
+              p-2
+              rounded-full
+              hover:bg-[#EAF4FB]
+              transition
+              text-[#355872]
+            "
+          >
+            <ArrowLeft size={32} />
+          </Link>
+
+          <div>
+            <h1 className="text-3xl font-bold text-[#355872]">
+              Approval Bimbingan
+            </h1>
+
+            <p className="text-gray-500 mt-2 font-medium">
+              Persetujuan pengajuan jadwal bimbingan mahasiswa kerja praktik
+            </p>
+          </div>
         </div>
 
         {/* Card Table Container */}
@@ -82,9 +99,6 @@ export default function ApprovalPage() {
             <h2 className="text-xl font-bold text-[#355872]">
               Daftar Pengajuan Jadwal
             </h2>
-            <p className="text-sm text-gray-500 mt-1 font-medium">
-              Silakan evaluasi dan tentukan keputusan persetujuan untuk pengajuan di bawah ini.
-            </p>
           </div>
 
           {/* Table Headers */}

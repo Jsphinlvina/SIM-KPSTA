@@ -99,7 +99,7 @@ export default function ModalPengajuanMandiri({
 
             <input
               type="text"
-              placeholder="Contoh: Rancang Bangun Aplikasi E-Commerce UMKM Desa"
+              placeholder="Judul"
               value={judul}
               onChange={(e) => setJudul(e.target.value)}
               className="
@@ -127,7 +127,7 @@ export default function ModalPengajuanMandiri({
 
             <textarea
               rows={5}
-              placeholder="Jelaskan secara singkat ruang lingkup sistem yang akan Anda bangun..."
+              placeholder="Jelaskan secara singkat ruang lingkup sistem yang akan dibangun..."
               value={deskripsi}
               onChange={(e) => setDeskripsi(e.target.value)}
               className="
