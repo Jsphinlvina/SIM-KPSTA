@@ -19,9 +19,8 @@ export default function UploadLaporanPage() {
   ];
 
   return (
-    <div className="w-screen min-h-screen bg-[#F7F8F0]">
-      {/* <Sidebar /> */}
-      <div className="flex-1 p-10 flex flex-col">
+    <div className="p-10 flex flex-col w-full">
+
       
       {/* Header */}
       <div className="flex items-start justify-between mb-10">
@@ -143,7 +142,6 @@ export default function UploadLaporanPage() {
             </div>
           ))}
         </div>
-      </div>
       </div>
     </div>
   );

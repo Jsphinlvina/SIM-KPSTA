@@ -1,25 +1,26 @@
 "use client";
 
-import Sidebar from "@/app/components/sidebar";
 import { useEffect, useState } from "react";
 import { Users, Clock, BookOpen, CheckCircle2, ArrowLeft } from "lucide-react";
 import api from "@/app/api";
 import Link from "next/link";
+import { DashboardDataManager, Student } from "./dashboard-data";
 
-type Student = {
-  id: number;
-  name: string;
-  nim: string;
-  topic: string;
-  status: string;
-  progress: number;
-};
+/**
+ * Singleton Pattern (FE):
+ * Data mahasiswa diambil dari DashboardDataManager.getInstance()
+ * bukan di-hardcode ulang tiap render, sehingga satu sumber data
+ * konsisten di seluruh sesi tanpa re-fetch berulang.
+ */
 
 export default function DashboardDosenPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [dosenProfile, setDosenProfile] = useState<any>(null);
 
-  // Fetch logged in profile
+  // Ambil data dari Singleton — satu instance, konsisten di seluruh sesi
+  const manager = DashboardDataManager.getInstance();
+
+  // Fetch profil dosen
   useEffect(() => {
     api.get("/auth/me/")
       .then((res) => {
@@ -32,43 +33,16 @@ export default function DashboardDosenPage() {
       });
   }, []);
 
+  // Load data dari Singleton
   useEffect(() => {
-    setStudents([
-      {
-        id: 1,
-        name: "Andi Saputra",
-        nim: "2272001",
-        topic: "Sistem Informasi Kerja Praktik Sekolah Tinggi",
-        status: "Aktif",
-        progress: 75,
-      },
-      {
-        id: 2,
-        name: "Budi Hartono",
-        nim: "2272002",
-        topic: "Penerapan AI untuk Kurikulum Edukasi Interaktif",
-        status: "Pending",
-        progress: 10,
-      },
-      {
-        id: 3,
-        name: "Citra Lestari",
-        nim: "2272003",
-        topic: "Website Real-time Monitoring IoT Laboratorium Mandiri",
-        status: "Aktif",
-        progress: 40,
-      },
-    ]);
+    setStudents(manager.getStudents());
   }, []);
 
-  const activeCount = students.filter(s => s.status === "Aktif").length;
-  const pendingCount = students.filter(s => s.status === "Pending").length;
+  const activeCount = manager.getActiveCount();
+  const pendingCount = manager.getPendingCount();
 
   return (
-    <div className="flex min-h-screen bg-[#F7F8F0]">
-      {/* <Sidebar /> */}
-
-      <div className="flex-1 p-10 flex flex-col">
+    <div className="p-10 flex flex-col w-full">
         {/* Header */}
         <div className="flex items-start justify-between mb-10">
           <div className="flex items-start gap-4">
@@ -221,7 +195,6 @@ export default function DashboardDosenPage() {
             ))}
           </div>
         </div>
-      </div>
     </div>
   );
 }

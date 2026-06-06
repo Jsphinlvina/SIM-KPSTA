@@ -152,9 +152,8 @@ export default function ListTopikPage() {
   };
 
   return (
-    <div className="w-screen min-h-screen bg-[#F7F8F0]">
-      {/* <Sidebar /> */}
-      <div className="flex-1 p-10 flex flex-col">
+    <div className="w-full min-h-full bg-[#F7F8F0]">
+      <div className="p-10 flex flex-col">
       
       {/* Header */}
       <div className="flex items-start justify-between mb-8">

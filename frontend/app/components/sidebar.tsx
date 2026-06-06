@@ -95,7 +95,7 @@ function SidebarContent({ role }: { role: SidebarRole }) {
   // Check if main category section has any active child
   const isCategoryActive = isKoordinator
     ? pathname === "/koordinator/penentuan-pembimbing" ||
-      pathname === "/koordinator/distribusi" ||
+      pathname === "/koordinator/distribusi-dosen" ||
       pathname === "/koordinator/laporan"
     : isAdmin
     ? pathname === "/admin/user"
@@ -185,13 +185,13 @@ function SidebarContent({ role }: { role: SidebarRole }) {
                     active={pathname === "/koordinator/penentuan-pembimbing"}
                   />
                   <SidebarSubLink
-                    href="/koordinator/distribusi"
+                    href="/koordinator/distribusi-dosen"
                     label="Beban Kerja Dosen"
-                    active={pathname === "/koordinator/distribusi"}
+                    active={pathname === "/koordinator/distribusi-dosen"}
                   />
                   <SidebarSubLink
                     href="/koordinator/laporan"
-                    label="Laporan Kelulusan"
+                    label="Laporan Statistik"
                     active={pathname === "/koordinator/laporan"}
                   />
                 </>

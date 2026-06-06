@@ -12,11 +12,13 @@ import {
 } from "lucide-react";
 import api from "../api";
 import NotificationPopup from "./notifikasi/page";
+import { AuthController } from "../login/auth-controller";
 
 export default function DashboardKoordinatorLanding() {
   const [nama, setNama] = useState("Koordinator");
   const router = useRouter();
   const [showNotification, setShowNotification] = useState(false);
+  const authController = new AuthController();
 
   useEffect(() => {
     api.get("/auth/me/")
@@ -35,15 +37,14 @@ export default function DashboardKoordinatorLanding() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("nim_nip");
+    authController.logout();
     router.push("/login");
   };
 
   return (
     <div className="relative min-h-screen w-full bg-[#F7F8F0]">
       {/* Top Actions */}
-      <div className="absolute top-10 right-10 flex gap-4 z-50">
+      <div className="fixed top-10 right-10 flex gap-4 z-50">
         {/* Notification */}
         <button
           onClick={() =>

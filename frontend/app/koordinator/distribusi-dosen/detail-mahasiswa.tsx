@@ -1,6 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
+import { DistribusiDataManager } from "./distribusi-data";
 
 interface DetailMahasiswaProps {
   open: boolean;
@@ -15,23 +16,14 @@ export default function DetailMahasiswa({
 }: DetailMahasiswaProps) {
   if (!open) return null;
 
-  const mahasiswa = [
-    {
-      nrp: "2272001",
-      nama: "Jessica Luwia",
-      topik: "Sistem Deteksi ASD",
-    },
-    {
-      nrp: "2272010",
-      nama: "Andi Saputra",
-      topik: "Website Monitoring IoT",
-    },
-    {
-      nrp: "2272020",
-      nama: "Budi Hartono",
-      topik: "AI untuk Edukasi",
-    },
-  ];
+  // Membaca data terbaru dari Singleton manager
+  const manager = DistribusiDataManager.getInstance();
+  const targetDosen = manager.getDistribusiData().find(
+    (d) => d.nama.toLowerCase().includes(namaDosen.toLowerCase()) || 
+           namaDosen.toLowerCase().includes(d.nama.toLowerCase())
+  );
+
+  const mahasiswaList = targetDosen ? targetDosen.mahasiswaList : [];
 
   return (
     <div
@@ -82,6 +74,7 @@ export default function DetailMahasiswa({
               rounded-xl
               hover:bg-gray-100
               text-[#355872]
+              cursor-pointer
             "
           >
             <X size={22} />
@@ -102,12 +95,12 @@ export default function DetailMahasiswa({
             "
           >
             <div>No</div>
-            <div>NRP</div>
+            <div>NIM / NRP</div>
             <div>Nama Mahasiswa</div>
-            <div>Topik</div>
+            <div>Topik Bimbingan</div>
           </div>
 
-          {mahasiswa.map((item, index) => (
+          {mahasiswaList.map((mName, index) => (
             <div
               key={index}
               className="
@@ -118,14 +111,21 @@ export default function DetailMahasiswa({
                 border-b
                 border-[#eef4f8]
                 text-[#355872]
+                items-center
               "
             >
               <div>{index + 1}</div>
-              <div>{item.nrp}</div>
-              <div>{item.nama}</div>
-              <div>{item.topik}</div>
+              <div>22720{index + 1}1</div>
+              <div className="font-bold">{mName}</div>
+              <div className="text-sm text-gray-500 font-medium">Sistem Informasi Pengajuan KP/STA</div>
             </div>
           ))}
+
+          {mahasiswaList.length === 0 && (
+            <div className="px-8 py-10 text-center text-gray-500 font-medium">
+              Belum ada mahasiswa bimbingan yang terdaftar untuk dosen ini.
+            </div>
+          )}
         </div>
       </div>
     </div>

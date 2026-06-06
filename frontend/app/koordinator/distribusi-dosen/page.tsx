@@ -2,35 +2,32 @@
 
 import Link from "next/link";
 import { ArrowLeft, Eye } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DetailMahasiswa from "./detail-mahasiswa";
+import { DistribusiDataManager, DosenDistribusi, IDistribusiObserver } from "./distribusi-data";
 
 export default function DistribusiDosenPage() {
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedDosen, setSelectedDosen] = useState("");
+  const [dosenList, setDosenList] = useState<DosenDistribusi[]>([]);
 
-  const dosenList = [
-    {
-      id: 1,
-      nama: "Dr. Meliana, S.Kom",
-      jumlahMahasiswa: 8,
-    },
-    {
-      id: 2,
-      nama: "Budi Santoso, M.Kom",
-      jumlahMahasiswa: 6,
-    },
-    {
-      id: 3,
-      nama: "Rina Wijaya, M.Kom",
-      jumlahMahasiswa: 5,
-    },
-    {
-      id: 4,
-      nama: "Andi Setiawan, M.T",
-      jumlahMahasiswa: 3,
-    },
-  ];
+  useEffect(() => {
+    const manager = DistribusiDataManager.getInstance();
+    setDosenList([...manager.getDistribusiData()]);
+
+    // Concrete Observer
+    const observer: IDistribusiObserver = {
+      onDistribusiChanged(updatedData) {
+        setDosenList([...updatedData]);
+      },
+    };
+
+    manager.registerObserver(observer);
+
+    return () => {
+      manager.removeObserver(observer);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F7F8F0] p-10">
@@ -71,7 +68,9 @@ export default function DistribusiDosenPage() {
             border
             border-[#dbe9f4]
             text-[#355872]
-            font-medium
+            font-semibold
+            text-sm
+            shadow-sm
           "
         >
           Genap 2025/2026
@@ -161,6 +160,7 @@ export default function DistribusiDosenPage() {
                   items-center
                   justify-center
                   transition
+                  cursor-pointer
                 "
               >
                 <Eye size={20} />

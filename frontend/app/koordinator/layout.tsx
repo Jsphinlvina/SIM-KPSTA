@@ -2,7 +2,7 @@
 
 import Sidebar from "@/app/components/sidebar";
 
-export default function MahasiswaLayout({
+export default function KoordinatorLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -14,4 +14,3 @@ export default function MahasiswaLayout({
     </div>
   );
 }
-

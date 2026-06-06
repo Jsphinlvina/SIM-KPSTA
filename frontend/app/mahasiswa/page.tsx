@@ -35,7 +35,7 @@ export default function DashboardMahasiswa() {
   return (
     <div className="relative min-h-screen w-full bg-[#F7F8F0]">
       {/* Top Actions */}
-      <div className="absolute top-10 right-10 flex gap-4 z-50">
+      <div className="fixed top-10 right-10 flex gap-4 z-50">
         {/* Notification */}
         <button
           onClick={() =>

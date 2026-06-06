@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
-import api from "../api";
+import { AuthController } from "./auth-controller";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,39 +14,29 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
 
+  // Instansiasi Controller (MVC)
+  const authController = new AuthController();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
-    console.log("Tombol login diklik! Mengirim data:", { nimNip, password });
+    const result = await authController.login(nimNip, password);
 
-    try {
-      const response = await api.post("/auth/login/", {
-        nim_nip: nimNip,
-        password: password,
-      });
-
-      if (response.data.success) {
-        const { access_token, user } = response.data.data;
-
-        localStorage.setItem("token", access_token);
-        localStorage.setItem("nim_nip", nimNip);
-
-        if (user.role === "mahasiswa") {
-          router.push("/mahasiswa");
-        } else if (user.role === "dosen") {
-          router.push("/dosen");
-        } else if (user.role === "koordinator") {
-          router.push("/koordinator");
-        } else if (user.role === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/");
-        }
+    if (result.success && result.role) {
+      if (result.role === "mahasiswa") {
+        router.push("/mahasiswa");
+      } else if (result.role === "dosen") {
+        router.push("/dosen");
+      } else if (result.role === "koordinator") {
+        router.push("/koordinator");
+      } else if (result.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/");
       }
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Terjadi kesalahan koneksi server.";
-      setErrorMsg(message);
+    } else if (result.error) {
+      setErrorMsg(result.error);
     }
   };
 
