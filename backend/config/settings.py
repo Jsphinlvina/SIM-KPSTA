@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     'apps.topik',
     'apps.pengajuan',
     'apps.bimbingan',
+    'apps.dashboard',
+    'apps.laporan',
 ]
 
 MIDDLEWARE = [
