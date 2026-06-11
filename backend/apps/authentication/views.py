@@ -26,13 +26,8 @@ class AuthController(viewsets.ViewSet):
         result = AuthService.authenticate_user(
             serializer.validated_data["nim_nip"], serializer.validated_data["password"]
         )
-        if result is None:
-            return fail(
-                message="NIM/NIP atau password salah",
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
         if "error" in result:
-            return fail(message=result["error"], status=status.HTTP_403_FORBIDDEN)
+            return fail(message=result["error"], status=status.HTTP_401_UNAUTHORIZED)
 
         return ok(data=result, message="Login berhasil")
 
@@ -60,24 +55,52 @@ class AuthController(viewsets.ViewSet):
     @action(
         detail=False,
         methods=["post"],
-        permission_classes=[IsAdmin],
+        permission_classes=[AllowAny],
         url_path="register",
     )
     def register(self, request):
-        serializer = UserSerializer(data=request.data)
-        if not serializer.is_valid():
-            return fail(
-                message="Validasi pendaftaran gagal",
-                errors=serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        required = ['nim_nip', 'nama_lengkap', 'email', 'password', 'role']
+        for field in required:
+            if not request.data.get(field):
+                return fail(
+                    message=f"Field '{field}' wajib diisi.",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        from apps.authentication.models import Users
+        if Users.objects.filter(nim_nip=request.data['nim_nip']).exists():
+            return fail(message="NIM/NIP sudah terdaftar.", status=status.HTTP_400_BAD_REQUEST)
+        if Users.objects.filter(email=request.data['email']).exists():
+            return fail(message="Email sudah terdaftar.", status=status.HTTP_400_BAD_REQUEST)
 
         user = UserService.register_user(request.data)
         return ok(
             data=UserSerializer(user).data,
-            message="Pengguna baru berhasil didaftarkan",
+            message="Pendaftaran berhasil. Menunggu persetujuan admin.",
             status=status.HTTP_201_CREATED,
         )
+
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[IsAdmin],
+        url_path="pending",
+    )
+    def list_pending(self, request):
+        users = UserService.get_pending_users()
+        return ok(data=UserSerializer(users, many=True).data, message="Daftar akun pending berhasil diambil")
+
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[IsAdmin],
+        url_path="approve",
+    )
+    def approve_user(self, request, pk=None):
+        role = request.data.get('role')
+        user = UserService.approve_user(pk, role=role)
+        if not user:
+            return fail(message="Pengguna tidak ditemukan", status=status.HTTP_404_NOT_FOUND)
+        return ok(data=UserSerializer(user).data, message="Akun berhasil disetujui")
 
     @action(
         detail=False,
@@ -93,8 +116,20 @@ class AuthController(viewsets.ViewSet):
         )
 
     @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[IsAuthenticated],
+        url_path="dosen",
+    )
+    def list_dosen(self, request):
+        from apps.authentication.models import Users
+        dosen = Users.objects.filter(role='dosen', is_active=True)
+        serializer = UserSerializer(dosen, many=True)
+        return ok(data=serializer.data, message="Daftar dosen berhasil diambil")
+
+    @action(
         detail=True,
-        methods=["get", "put"],
+        methods=["get", "put", "delete"],
         permission_classes=[IsAdmin],
         url_path="manage",
     )
@@ -121,3 +156,36 @@ class AuthController(viewsets.ViewSet):
                 data=UserSerializer(user).data,
                 message="Data pengguna berhasil diperbarui",
             )
+
+        elif request.method == "DELETE":
+            deleted = UserService.delete_user(pk)
+            if not deleted:
+                return fail(message="Pengguna tidak ditemukan", status=status.HTTP_404_NOT_FOUND)
+            return ok(message="Akun berhasil dihapus")
+
+    @action(
+        detail=False,
+        methods=["post"],
+        permission_classes=[IsAuthenticated],
+        url_path="change-password",
+    )
+    def change_password(self, request):
+        new_password = request.data.get("new_password", "").strip()
+        if not new_password or len(new_password) < 6:
+            return fail(message="Password baru minimal 6 karakter.", status=status.HTTP_400_BAD_REQUEST)
+        success = UserService.change_password(request.user.pk, new_password)
+        if not success:
+            return fail(message="Gagal mengganti password.", status=status.HTTP_400_BAD_REQUEST)
+        return ok(message="Password berhasil diperbarui.")
+
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[IsAdmin],
+        url_path="reset-password",
+    )
+    def reset_password(self, request, pk=None):
+        success = UserService.reset_password(pk)
+        if not success:
+            return fail(message="Pengguna tidak ditemukan", status=status.HTTP_404_NOT_FOUND)
+        return ok(message="Password berhasil direset ke default")

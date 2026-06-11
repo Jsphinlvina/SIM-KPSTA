@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-[#F7F8F0] min-h-screen`}>
+      <body className={`${inter.className} bg-[#F7F8F0] min-h-screen`} suppressHydrationWarning>
         <div className="w-full min-h-screen flex flex-col">
           {children}
         </div>

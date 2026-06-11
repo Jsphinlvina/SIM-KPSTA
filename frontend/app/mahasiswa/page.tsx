@@ -12,18 +12,22 @@ import {
   Bell,
   LogOut,
 } from "lucide-react";
+import api from "../api";
 
 export default function DashboardMahasiswa() {
-  const [nim, setNim] = useState("");
+  const [nama, setNama] = useState("");
   const router = useRouter();
   const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
-    const storedNim = localStorage.getItem("nim_nip");
-
-    if (storedNim) {
-      setNim(storedNim);
-    }
+    api.get("/auth/me/")
+      .then((res) => {
+        if (res.data.success) setNama(res.data.data.nama_lengkap);
+      })
+      .catch(() => {
+        const fallback = localStorage.getItem("nim_nip");
+        if (fallback) setNama(fallback);
+      });
   }, []);
 
   const handleLogout = () => {
@@ -108,7 +112,7 @@ export default function DashboardMahasiswa() {
       >
         {/* Welcome */}
         <h1 className="text-5xl font-bold text-[#355872] mb-20">
-          Welcome, {nim}
+          Welcome, {nama}
         </h1>
 
         {/* Cards */}

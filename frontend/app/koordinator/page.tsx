@@ -14,8 +14,15 @@ import api from "../api";
 import NotificationPopup from "./notifikasi/page";
 import { AuthController } from "../login/auth-controller";
 
+interface Summary {
+  total_dosen_pembimbing: number;
+  total_mahasiswa_bimbingan: number;
+  rata_rata_mahasiswa_per_dosen: number;
+}
+
 export default function DashboardKoordinatorLanding() {
   const [nama, setNama] = useState("Koordinator");
+  const [summary, setSummary] = useState<Summary | null>(null);
   const router = useRouter();
   const [showNotification, setShowNotification] = useState(false);
   const authController = new AuthController();
@@ -23,17 +30,15 @@ export default function DashboardKoordinatorLanding() {
   useEffect(() => {
     api.get("/auth/me/")
       .then((res) => {
-        if (res.data.success) {
-          setNama(res.data.data.nama_lengkap);
-        }
+        if (res.data.success) setNama(res.data.data.nama_lengkap);
       })
-      .catch((err) => {
-        console.error("Gagal memuat profil koordinator:", err);
-        const storedNip = localStorage.getItem("nim_nip");
-        if (storedNip) {
-          setNama(storedNip);
-        }
+      .catch(() => {
+        const stored = localStorage.getItem("nim_nip");
+        if (stored) setNama(stored);
       });
+    api.get("/dashboard/summary/")
+      .then((res) => { if (res.data.success) setSummary(res.data.data); })
+      .catch(() => {});
   }, []);
 
   const handleLogout = () => {
@@ -117,9 +122,27 @@ export default function DashboardKoordinatorLanding() {
         "
       >
         {/* Welcome */}
-        <h1 className="text-5xl font-bold text-[#355872] mb-20">
+        <h1 className="text-5xl font-bold text-[#355872] mb-10">
           Welcome, {nama}
         </h1>
+
+        {/* Summary Stats */}
+        {summary && (
+          <div className="flex gap-6 mb-14">
+            <div className="bg-white border border-[#dbe9f4] rounded-2xl shadow-sm px-8 py-5 text-center min-w-[160px]">
+              <p className="text-4xl font-bold text-[#355872]">{summary.total_dosen_pembimbing}</p>
+              <p className="text-gray-500 mt-1 text-sm">Dosen Pembimbing</p>
+            </div>
+            <div className="bg-white border border-[#dbe9f4] rounded-2xl shadow-sm px-8 py-5 text-center min-w-[160px]">
+              <p className="text-4xl font-bold text-[#355872]">{summary.total_mahasiswa_bimbingan}</p>
+              <p className="text-gray-500 mt-1 text-sm">Mahasiswa Bimbingan</p>
+            </div>
+            <div className="bg-white border border-[#dbe9f4] rounded-2xl shadow-sm px-8 py-5 text-center min-w-[160px]">
+              <p className="text-4xl font-bold text-[#355872]">{summary.rata_rata_mahasiswa_per_dosen}</p>
+              <p className="text-gray-500 mt-1 text-sm">Rata-rata / Dosen</p>
+            </div>
+          </div>
+        )}
 
         {/* Cards */}
         <div className="flex items-center justify-center gap-10">

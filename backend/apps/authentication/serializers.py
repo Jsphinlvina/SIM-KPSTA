@@ -9,7 +9,7 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = ['user_id', 'nim_nip', 'nama_lengkap', 'email', 'role', 'is_active']
+        fields = ['user_id', 'nim_nip', 'nama_lengkap', 'email', 'role', 'is_active', 'must_change_password']
         read_only_fields = ['user_id']
         extra_kwargs = {
             'password': {'write_only': True, 'required': False}

@@ -106,6 +106,8 @@ export default function ListTopikPage() {
     fetchHistory();
   }, []);
 
+  const hasActiveSubmission = history.some((item) => item.status !== "rejected");
+
   const handleOpenProposal = (topic: TopicItem) => {
     setSelectedTopic(topic);
     setDeskripsiSistem("");
@@ -183,22 +185,24 @@ export default function ListTopikPage() {
           </div>
         </div>
 
-        <button
-          onClick={() => setOpenModal(true)}
-          className="
-            px-6
-            h-12
-            rounded-full
-            bg-[#355872]
-            hover:bg-[#7AAACE]
-            text-white
-            font-semibold
-            transition
-            shadow-sm
-          "
-        >
-          Pengajuan Topik Mandiri +
-        </button>
+        {!hasActiveSubmission && (
+          <button
+            onClick={() => setOpenModal(true)}
+            className="
+              px-6
+              h-12
+              rounded-full
+              bg-[#355872]
+              hover:bg-[#7AAACE]
+              text-white
+              font-semibold
+              transition
+              shadow-sm
+            "
+          >
+            Pengajuan Topik Mandiri +
+          </button>
+        )}
       </div>
 
       {/* Tabs */}
@@ -239,6 +243,14 @@ export default function ListTopikPage() {
           Riwayat Pengajuan
         </button>
       </div>
+
+      {/* Active submission banner */}
+      {hasActiveSubmission && (
+        <div className="flex items-center gap-3 mb-6 px-5 py-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm font-medium">
+          <AlertCircle size={18} className="shrink-0 text-amber-500" />
+          Anda sudah memiliki pengajuan yang sedang diproses. Pengajuan baru hanya dapat dilakukan setelah pengajuan sebelumnya ditolak.
+        </div>
+      )}
 
       {/* TOPIK DOSEN */}
       {activeTab === "topik" && (
@@ -283,25 +295,27 @@ export default function ListTopikPage() {
                   </td>
 
                   <td className="px-6 py-5 text-right pr-10">
-                    <button
-                      onClick={() => handleOpenProposal(item)}
-                      disabled={item.quota <= 0 || !item.topik_id}
-                      className="
-                        px-5
-                        py-2
-                        rounded-full
-                        bg-[#355872]
-                        hover:bg-[#7AAACE]
-                        text-white
-                        text-sm
-                        font-semibold
-                        transition
-                        disabled:opacity-40
-                        disabled:cursor-not-allowed
-                      "
-                    >
-                      Ajukan Topik
-                    </button>
+                    {!hasActiveSubmission && (
+                      <button
+                        onClick={() => handleOpenProposal(item)}
+                        disabled={item.quota <= 0 || !item.topik_id}
+                        className="
+                          px-5
+                          py-2
+                          rounded-full
+                          bg-[#355872]
+                          hover:bg-[#7AAACE]
+                          text-white
+                          text-sm
+                          font-semibold
+                          transition
+                          disabled:opacity-40
+                          disabled:cursor-not-allowed
+                        "
+                      >
+                        Ajukan Topik
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

@@ -1,13 +1,15 @@
 /**
  * Design Patterns (FE):
- * 
+ *
  * 1. Observer Pattern:
  *    - IDistribusiObserver: interface bagi komponen yang memantau perubahan data.
  *    - DistribusiDataManager (Subject): publisher yang memberitahu observer ketika ada mahasiswa baru yang ditugaskan.
- * 
+ *
  * 2. Singleton Pattern:
  *    - DistribusiDataManager: satu-satunya instance penyimpan data beban bimbingan dosen di seluruh aplikasi.
  */
+
+import api from "../../api";
 
 export interface IDistribusiObserver {
   onDistribusiChanged(data: DosenDistribusi[]): void;
@@ -106,6 +108,20 @@ export class DistribusiDataManager {
 
   public getDistribusiData(): DosenDistribusi[] {
     return this.data;
+  }
+
+  public async loadFromApi(): Promise<void> {
+    const res = await api.get("/dashboard/distribusi/");
+    if (res.data.success) {
+      const distribusiDict: Record<string, any> = res.data.data;
+      this.data = Object.entries(distribusiDict).map(([dosen_id, info]) => ({
+        id: parseInt(dosen_id),
+        nama: info.nama_dosen,
+        jumlahMahasiswa: info.jumlah_mahasiswa,
+        mahasiswaList: (info.mahasiswa as any[]).map((m) => m.nama),
+      }));
+      this.notifyObservers();
+    }
   }
 
   public addMahasiswaToDosen(dosenNama: string, mahasiswaNama: string): void {

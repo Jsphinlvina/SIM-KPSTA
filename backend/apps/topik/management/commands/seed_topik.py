@@ -27,7 +27,7 @@ class Command(BaseCommand):
             with transaction.atomic():
                 periode, created = PeriodeSemester.objects.get_or_create(
                     nama_periode="2025/2026 Ganjil",
-                    defaults={"status_periode": "aktif"},
+                    defaults={"status_periode": True},
                 )
                 if created:
                     self.stdout.write(

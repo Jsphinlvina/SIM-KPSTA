@@ -21,7 +21,6 @@ export default function NotificationPopup({
     const subject = KoordinatorNotificationSubject.getInstance();
     setNotifications([...subject.getNotifications()]);
 
-    // Concrete Observer
     const observer: IKoordinatorNotificationObserver = {
       onNotificationReceived(notifs) {
         setNotifications([...notifs]);
@@ -29,6 +28,7 @@ export default function NotificationPopup({
     };
 
     subject.registerObserver(observer);
+    subject.loadFromApi();
 
     return () => {
       subject.removeObserver(observer);
@@ -37,6 +37,10 @@ export default function NotificationPopup({
 
   const handleMarkAllRead = () => {
     KoordinatorNotificationSubject.getInstance().markAllAsRead();
+  };
+
+  const handleMarkRead = (id: number) => {
+    KoordinatorNotificationSubject.getInstance().markAsRead(id);
   };
 
   const handleClearAll = () => {
@@ -124,6 +128,7 @@ export default function NotificationPopup({
         {notifications.map((item) => (
           <div
             key={item.id}
+            onClick={() => handleMarkRead(item.id)}
             className={`
               flex
               items-start

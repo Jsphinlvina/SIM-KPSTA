@@ -15,7 +15,7 @@ class TopikPenawaranDosen(AbstractTopikPenawaran):
             raise ValidationError({"judul": "Judul topik ini sudah pernah ditawarkan sebelumnya."})
 
     def assign_periode(self):
-        periode_aktif = PeriodeSemester.objects.filter(status_periode='aktif').first()
+        periode_aktif = PeriodeSemester.objects.filter(status_periode=True).first()
         if not periode_aktif:
             raise ValidationError({"error": "Tidak dapat membuat topik. Belum ada Periode Semester yang berstatus AKTIF saat ini."})
         return periode_aktif

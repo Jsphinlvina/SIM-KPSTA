@@ -1,5 +1,5 @@
 import React from "react";
-import { Users, CheckCircle2, Clock, XCircle, TrendingUp, FileText, Download } from "lucide-react";
+import { Users, CheckCircle2, Clock, XCircle, TrendingUp, FileText, Download, FileSpreadsheet } from "lucide-react";
 import Link from "next/link";
 
 /**
@@ -13,10 +13,26 @@ import Link from "next/link";
  *    - LaporanFactory: Membuat objek laporan (LaporanBulanan atau LaporanSemester) secara dinamis.
  */
 
+export interface LaporanApiData {
+  statistik?: {
+    total_pengajuan: number;
+    per_status: { draft: number; submitted: number; approved: number; rejected: number };
+    persentase_disetujui: number;
+  };
+  distribusi?: Record<
+    string,
+    { nama_dosen: string; nip: string; jumlah_mahasiswa: number; mahasiswa: { nama: string; nim: string; topik: string }[] }
+  >;
+  total_dosen?: number;
+}
+
 export interface LaporanProps {
   onBack: () => void;
   onTypeChange: (type: "bulanan" | "semester") => void;
   reportType: "bulanan" | "semester";
+  apiData?: LaporanApiData;
+  onExportPDF?: () => void;
+  onExportExcel?: () => void;
 }
 
 export abstract class LaporanTemplate {
@@ -82,9 +98,19 @@ export class LaporanBulanan extends LaporanTemplate {
             <option value="bulanan">Tipe Laporan: Bulanan</option>
             <option value="semester">Tipe Laporan: Semester</option>
           </select>
-          <button className="flex items-center gap-2 px-5 py-3 bg-[#355872] hover:bg-[#7AAACE] text-white rounded-2xl font-semibold text-sm transition shadow-sm cursor-pointer">
+          <button
+            onClick={this.props.onExportPDF}
+            className="flex items-center gap-2 px-5 py-3 bg-[#355872] hover:bg-[#7AAACE] text-white rounded-2xl font-semibold text-sm transition shadow-sm cursor-pointer"
+          >
             <Download size={16} />
             Export PDF
+          </button>
+          <button
+            onClick={this.props.onExportExcel}
+            className="flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-semibold text-sm transition shadow-sm cursor-pointer"
+          >
+            <FileSpreadsheet size={16} />
+            Export Excel
           </button>
         </div>
       </div>
@@ -92,11 +118,12 @@ export class LaporanBulanan extends LaporanTemplate {
   }
 
   protected renderSummaryCards(): React.ReactNode {
+    const s = this.props.apiData?.statistik;
     const cards = [
-      { label: "Pengajuan Bulan Ini", value: 12, sub: "Menunjukkan tren aktif", icon: Clock, color: "bg-amber-50 text-amber-600" },
-      { label: "Disetujui Bulan Ini", value: 9, sub: "Tingkat persetujuan 75%", icon: CheckCircle2, color: "bg-green-50 text-green-600" },
-      { label: "Bimbingan Aktif", value: 48, sub: "Beban saat ini", icon: Users, color: "bg-[#EAF4FB] text-[#355872]" },
-      { label: "Ditolak Bulan Ini", value: 1, sub: "Butuh revisi topik", icon: XCircle, color: "bg-red-50 text-red-500" },
+      { label: "Pengajuan Bulan Ini", value: s?.total_pengajuan ?? 12, sub: "Menunjukkan tren aktif", icon: Clock, color: "bg-amber-50 text-amber-600" },
+      { label: "Disetujui Bulan Ini", value: s?.per_status?.approved ?? 9, sub: `Tingkat persetujuan ${s?.persentase_disetujui ?? 75}%`, icon: CheckCircle2, color: "bg-green-50 text-green-600" },
+      { label: "Bimbingan Aktif", value: s?.per_status?.submitted ?? 48, sub: "Menunggu / aktif", icon: Users, color: "bg-[#EAF4FB] text-[#355872]" },
+      { label: "Ditolak Bulan Ini", value: s?.per_status?.rejected ?? 1, sub: "Butuh revisi topik", icon: XCircle, color: "bg-red-50 text-red-500" },
     ];
 
     return (
@@ -256,9 +283,19 @@ export class LaporanSemester extends LaporanTemplate {
             <option value="bulanan">Tipe Laporan: Bulanan</option>
             <option value="semester">Tipe Laporan: Semester</option>
           </select>
-          <button className="flex items-center gap-2 px-5 py-3 bg-[#355872] hover:bg-[#7AAACE] text-white rounded-2xl font-semibold text-sm transition shadow-sm cursor-pointer">
+          <button
+            onClick={this.props.onExportPDF}
+            className="flex items-center gap-2 px-5 py-3 bg-[#355872] hover:bg-[#7AAACE] text-white rounded-2xl font-semibold text-sm transition shadow-sm cursor-pointer"
+          >
             <Download size={16} />
             Export PDF
+          </button>
+          <button
+            onClick={this.props.onExportExcel}
+            className="flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-semibold text-sm transition shadow-sm cursor-pointer"
+          >
+            <FileSpreadsheet size={16} />
+            Export Excel
           </button>
         </div>
       </div>
@@ -266,11 +303,13 @@ export class LaporanSemester extends LaporanTemplate {
   }
 
   protected renderSummaryCards(): React.ReactNode {
+    const s = this.props.apiData?.statistik;
+    const total = s?.total_pengajuan ?? 48;
     const cards = [
-      { label: "Total Mahasiswa Terdaftar", value: 48, sub: "Periode Genap 2025/2026", icon: Users, color: "bg-[#EAF4FB] text-[#355872]" },
-      { label: "Topik Disetujui", value: 35, sub: "Tingkat persetujuan 72.9%", icon: CheckCircle2, color: "bg-green-50 text-green-600" },
-      { label: "Menunggu Persetujuan", value: 9, sub: "Perlu ditindaklanjuti segera", icon: Clock, color: "bg-amber-50 text-amber-600" },
-      { label: "Topik Ditolak", value: 4, sub: "Ditinjau kembali", icon: XCircle, color: "bg-red-50 text-red-500" },
+      { label: "Total Mahasiswa Terdaftar", value: total, sub: "Periode Genap 2025/2026", icon: Users, color: "bg-[#EAF4FB] text-[#355872]" },
+      { label: "Topik Disetujui", value: s?.per_status?.approved ?? 35, sub: `Tingkat persetujuan ${s?.persentase_disetujui ?? 72.9}%`, icon: CheckCircle2, color: "bg-green-50 text-green-600" },
+      { label: "Menunggu Persetujuan", value: s?.per_status?.submitted ?? 9, sub: "Perlu ditindaklanjuti segera", icon: Clock, color: "bg-amber-50 text-amber-600" },
+      { label: "Topik Ditolak", value: s?.per_status?.rejected ?? 4, sub: "Ditinjau kembali", icon: XCircle, color: "bg-red-50 text-red-500" },
     ];
 
     return (
@@ -298,11 +337,14 @@ export class LaporanSemester extends LaporanTemplate {
   }
 
   protected renderCharts(): React.ReactNode {
+    const totalReal = this.props.apiData?.statistik?.total_pengajuan ?? 48;
+    const approved = this.props.apiData?.statistik?.per_status?.approved ?? 28;
+    const pending = totalReal - approved;
     const breakdown = [
-      { label: "Topik Dosen", value: 28, color: "#355872" },
-      { label: "Topik Mandiri", value: 20, color: "#7AAACE" },
+      { label: "Topik Disetujui", value: approved, color: "#355872" },
+      { label: "Belum Disetujui", value: pending, color: "#7AAACE" },
     ];
-    const total = 48;
+    const total = totalReal;
 
     return (
       <>
@@ -348,12 +390,19 @@ export class LaporanSemester extends LaporanTemplate {
   }
 
   protected renderDetailTable(): React.ReactNode {
-    const dosenData = [
-      { nama: "Dr. Budi Santoso, M.T.", nip: "72001", jumlah: 9, max: 10, status: "Hampir Penuh" },
-      { nama: "Siti Aisyah, S.Si, M.Kom", nip: "72002", jumlah: 7, max: 10, status: "Aktif" },
-      { nama: "Rizky Maulana, M.Sc", nip: "72003", jumlah: 6, max: 10, status: "Aktif" },
-      { nama: "Dewi Permata, M.T.", nip: "72004", jumlah: 5, max: 10, status: "Aktif" },
-    ];
+    const distribusiDict = this.props.apiData?.distribusi;
+    const dosenData = distribusiDict
+      ? Object.entries(distribusiDict).map(([, info]) => ({
+          nama: info.nama_dosen,
+          nip: info.nip,
+          jumlah: info.jumlah_mahasiswa,
+        }))
+      : [
+          { nama: "Dr. Budi Santoso, M.T.", nip: "72001", jumlah: 9 },
+          { nama: "Siti Aisyah, S.Si, M.Kom", nip: "72002", jumlah: 7 },
+          { nama: "Rizky Maulana, M.Sc", nip: "72003", jumlah: 6 },
+          { nama: "Dewi Permata, M.T.", nip: "72004", jumlah: 5 },
+        ];
 
     return (
       <div className="bg-white rounded-3xl border border-[#e6eef5] shadow-sm overflow-hidden">
@@ -368,7 +417,7 @@ export class LaporanSemester extends LaporanTemplate {
           {dosenData.map((d, i) => (
             <div key={i} className="px-8 py-4 flex items-center justify-between">
               <span className="font-bold text-[#355872]">{d.nama}</span>
-              <span className="text-sm font-semibold text-gray-500">{d.jumlah} / {d.max} Mahasiswa</span>
+              <span className="text-sm font-semibold text-gray-500">{d.jumlah} Mahasiswa</span>
             </div>
           ))}
         </div>

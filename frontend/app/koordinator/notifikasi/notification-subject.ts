@@ -1,13 +1,10 @@
 /**
  * Design Patterns (FE):
- * 
- * 1. Observer Pattern:
- *    - IKoordinatorNotificationObserver: interface untuk subscriber notifikasi.
- *    - KoordinatorNotificationSubject (Subject): publisher yang memberitahu observer ketika ada notifikasi baru.
- * 
- * 2. Singleton Pattern:
- *    - KoordinatorNotificationSubject: satu instance penyimpan notifikasi koordinator.
+ * 1. Observer Pattern — IKoordinatorNotificationObserver / KoordinatorNotificationSubject
+ * 2. Singleton Pattern — KoordinatorNotificationSubject
  */
+
+import api from "../../api";
 
 export interface KoordinatorNotification {
   id: number;
@@ -25,29 +22,7 @@ export class KoordinatorNotificationSubject {
   private observers: IKoordinatorNotificationObserver[] = [];
   private notifications: KoordinatorNotification[] = [];
 
-  private constructor() {
-    // Mock initial notifications
-    this.notifications = [
-      {
-        id: 1,
-        message: "Mahasiswa Andi Saputra mengajukan topik mandiri baru.",
-        isRead: false,
-        time: "Baru saja",
-      },
-      {
-        id: 2,
-        message: "Dosen Budi Santoso menyetujui jadwal bimbingan Budi Hartono.",
-        isRead: false,
-        time: "10 menit lalu",
-      },
-      {
-        id: 3,
-        message: "Mahasiswa Citra Lestari mengunggah laporan revisi KP.",
-        isRead: true,
-        time: "1 jam lalu",
-      },
-    ];
-  }
+  private constructor() {}
 
   public static getInstance(): KoordinatorNotificationSubject {
     if (!KoordinatorNotificationSubject.instance) {
@@ -76,6 +51,20 @@ export class KoordinatorNotificationSubject {
     return this.notifications;
   }
 
+  public async loadFromApi(): Promise<void> {
+    try {
+      const res = await api.get("/notification/");
+      const raw: any[] = res.data.data || [];
+      this.notifications = raw.map((n) => ({
+        id: n.id,
+        message: n.message,
+        isRead: n.is_read,
+        time: new Date(n.created_at).toLocaleString("id-ID"),
+      }));
+      this.notifyAll();
+    } catch (_) {}
+  }
+
   public addNotification(message: string): void {
     const newNotif: KoordinatorNotification = {
       id: Date.now(),
@@ -87,9 +76,24 @@ export class KoordinatorNotificationSubject {
     this.notifyAll();
   }
 
+  public markAsRead(id: number): void {
+    this.notifications = this.notifications.map((n) =>
+      n.id === id ? { ...n, isRead: true } : n
+    );
+    this.notifyAll();
+    api.post(`/notification/${id}/mark-as-read/`).catch(() => {});
+  }
+
   public markAllAsRead(): void {
     this.notifications = this.notifications.map((n) => ({ ...n, isRead: true }));
     this.notifyAll();
+    api.post("/notification/mark-all-as-read/").catch(() => {});
+  }
+
+  public deleteNotification(id: number): void {
+    this.notifications = this.notifications.filter((n) => n.id !== id);
+    this.notifyAll();
+    api.delete(`/notification/${id}/`).catch(() => {});
   }
 
   public clearAll(): void {

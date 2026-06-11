@@ -28,21 +28,8 @@ export class AuthSessionManager {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token");
       const nim_nip = localStorage.getItem("nim_nip") || "";
-      let role: UserSession["role"] = "";
-
-      // Logika tebak role sederhana berdasarkan NIM/NIP atau dari local state
-      if (token) {
-        if (nim_nip.startsWith("227") || nim_nip.startsWith("247")) {
-          role = "mahasiswa";
-        } else if (nim_nip === "admin") {
-          role = "admin";
-        } else if (nim_nip === "72000" || nim_nip === "koordinator") {
-          role = "koordinator";
-        } else {
-          role = "dosen";
-        }
-      }
-
+      const storedRole = localStorage.getItem("role") as UserSession["role"] | null;
+      const role: UserSession["role"] = token && storedRole ? storedRole : "";
       this.currentSession = { nim_nip, role };
     }
   }
@@ -51,6 +38,7 @@ export class AuthSessionManager {
     if (typeof window !== "undefined") {
       localStorage.setItem("token", token);
       localStorage.setItem("nim_nip", nim_nip);
+      localStorage.setItem("role", role);
     }
     this.currentSession = { nim_nip, role };
   }
@@ -59,6 +47,7 @@ export class AuthSessionManager {
     if (typeof window !== "undefined") {
       localStorage.removeItem("token");
       localStorage.removeItem("nim_nip");
+      localStorage.removeItem("role");
     }
     this.currentSession = { nim_nip: "", role: "" };
   }

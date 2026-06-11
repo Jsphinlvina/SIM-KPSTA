@@ -16,10 +16,8 @@ export class AuthController {
   public async login(
     nimNip: string,
     password: string
-  ): Promise<{ success: boolean; role?: UserSession["role"]; error?: string }> {
+  ): Promise<{ success: boolean; role?: UserSession["role"]; mustChangePassword?: boolean; error?: string }> {
     try {
-      console.log("AuthController: Memulai login untuk:", nimNip);
-      
       const response = await api.post("/auth/login/", {
         nim_nip: nimNip,
         password: password,
@@ -29,17 +27,20 @@ export class AuthController {
         const { access_token, user } = response.data.data;
         const role = user.role as UserSession["role"];
 
-        // Update Model (AuthSessionManager)
         this.sessionManager.setSession(nimNip, access_token, role);
 
-        return { success: true, role };
+        return { success: true, role, mustChangePassword: user.must_change_password ?? false };
       }
 
       return { success: false, error: "Login gagal" };
     } catch (err: any) {
-      console.error("AuthController Error:", err);
-      const errorMsg =
-        err.response?.data?.message || "Terjadi kesalahan koneksi server.";
+      const code: string = err.response?.data?.message ?? "";
+      const ERROR_MESSAGES: Record<string, string> = {
+        USER_NOT_FOUND: "Akun Anda belum terdaftar.",
+        WRONG_PASSWORD: "Password Anda salah.",
+        PENDING_APPROVAL: "Akun Anda belum disetujui, mohon dapat hubungi Admin.",
+      };
+      const errorMsg = ERROR_MESSAGES[code] ?? "Terjadi kesalahan koneksi server.";
       return { success: false, error: errorMsg };
     }
   }

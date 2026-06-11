@@ -14,16 +14,17 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
 
-  // Instansiasi Controller (MVC)
-  const authController = new AuthController();
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
-    const result = await authController.login(nimNip, password);
+    const result = await new AuthController().login(nimNip, password);
 
     if (result.success && result.role) {
+      if (result.mustChangePassword) {
+        router.push("/change-password");
+        return;
+      }
       if (result.role === "mahasiswa") {
         router.push("/mahasiswa");
       } else if (result.role === "dosen") {
@@ -143,6 +144,13 @@ export default function LoginPage() {
               Lupa Password?
             </button>
           </div> */}
+
+          {/* Error message */}
+          {errorMsg && (
+            <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm text-center">
+              {errorMsg}
+            </div>
+          )}
 
           {/* Button */}
           <button

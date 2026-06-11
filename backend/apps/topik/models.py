@@ -2,20 +2,15 @@ from django.db import models
 from apps.authentication.models import Users
 
 class PeriodeSemester(models.Model):
-    STATUS_CHOICES = [
-        ('aktif', 'Aktif'),
-        ('nonaktif', 'Nonaktif'),
-    ]
-
     periode_semester_id = models.AutoField(primary_key=True)
-    nama_periode = models.CharField(max_length=100)
-    status_periode = models.CharField(max_length=10, choices=STATUS_CHOICES, default='nonaktif')
+    nama_periode = models.CharField(max_length=100, unique=True)
+    status_periode = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'periode_semester'
 
     def __str__(self):
-        return f"{self.nama_periode} ({self.status_periode})"
+        return f"{self.nama_periode} ({'Aktif' if self.status_periode else 'Nonaktif'})"
 
 
 class Topik(models.Model):

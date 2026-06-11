@@ -96,23 +96,37 @@ function SidebarContent({ role }: { role: SidebarRole }) {
   const isCategoryActive = isKoordinator
     ? pathname === "/koordinator/penentuan-pembimbing" ||
       pathname === "/koordinator/distribusi-dosen" ||
-      pathname === "/koordinator/laporan"
+      pathname === "/koordinator/laporan" ||
+      pathname === "/koordinator/kelayakan-pembimbing" ||
+      pathname === "/koordinator/arsip" ||
+      pathname === "/koordinator/jadwal-sidang"
     : isAdmin
-    ? pathname === "/admin/user"
+    ? pathname === "/admin/user" ||
+      pathname === "/admin/periode-semester"
     : isDosen
     ? pathname === "/dosen/dashboard" ||
       pathname === "/dosen/approval" ||
-      pathname === "/dosen/penawaran-topik"
+      pathname === "/dosen/penawaran-topik" ||
+      pathname === "/dosen/kelayakan-pembimbing"
     : pathname === "/mahasiswa/list-topik" ||
       pathname === "/mahasiswa/jadwal-bimbingan";
 
   // Check if Dokumen section has any active child (Mahasiswa only)
   const isDokumenActive = isMahasiswa && pathname === "/mahasiswa/upload-laporan";
 
-  // Handle Logout function
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        await fetch("http://127.0.0.1:8000/api/auth/logout/", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch (_) {}
     localStorage.removeItem("token");
     localStorage.removeItem("nim_nip");
+    localStorage.removeItem("role");
     router.push("/login");
   };
 
@@ -185,6 +199,11 @@ function SidebarContent({ role }: { role: SidebarRole }) {
                     active={pathname === "/koordinator/penentuan-pembimbing"}
                   />
                   <SidebarSubLink
+                    href="/koordinator/kelayakan-pembimbing"
+                    label="Kelayakan Pembimbing"
+                    active={pathname === "/koordinator/kelayakan-pembimbing"}
+                  />
+                  <SidebarSubLink
                     href="/koordinator/distribusi-dosen"
                     label="Beban Kerja Dosen"
                     active={pathname === "/koordinator/distribusi-dosen"}
@@ -194,6 +213,16 @@ function SidebarContent({ role }: { role: SidebarRole }) {
                     label="Laporan Statistik"
                     active={pathname === "/koordinator/laporan"}
                   />
+                  <SidebarSubLink
+                    href="/koordinator/arsip"
+                    label="Arsip"
+                    active={pathname === "/koordinator/arsip"}
+                  />
+                  <SidebarSubLink
+                    href="/koordinator/jadwal-sidang"
+                    label="Jadwal Sidang"
+                    active={pathname === "/koordinator/jadwal-sidang"}
+                  />
                 </>
               ) : isAdmin ? (
                 <>
@@ -201,6 +230,11 @@ function SidebarContent({ role }: { role: SidebarRole }) {
                     href="/admin/user"
                     label="Kelola User"
                     active={pathname === "/admin/user"}
+                  />
+                  <SidebarSubLink
+                    href="/admin/periode-semester"
+                    label="Periode Semester"
+                    active={pathname === "/admin/periode-semester"}
                   />
                 </>
               ) : isDosen ? (
@@ -210,13 +244,16 @@ function SidebarContent({ role }: { role: SidebarRole }) {
                     label="Dashboard"
                     active={pathname === "/dosen/dashboard"}
                   />
-
                   <SidebarSubLink
                     href="/dosen/approval"
                     label="Approval Bimbingan"
                     active={pathname === "/dosen/approval"}
                   />
-
+                  <SidebarSubLink
+                    href="/dosen/kelayakan-pembimbing"
+                    label="Kelayakan Pembimbing"
+                    active={pathname === "/dosen/kelayakan-pembimbing"}
+                  />
                   <SidebarSubLink
                     href="/dosen/penawaran-topik"
                     label="Penawaran Topik"

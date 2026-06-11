@@ -13,16 +13,18 @@ export default function DistribusiDosenPage() {
 
   useEffect(() => {
     const manager = DistribusiDataManager.getInstance();
-    setDosenList([...manager.getDistribusiData()]);
 
-    // Concrete Observer
+    // Concrete Observer (registered before loadFromApi so first notify is caught)
     const observer: IDistribusiObserver = {
       onDistribusiChanged(updatedData) {
         setDosenList([...updatedData]);
       },
     };
-
     manager.registerObserver(observer);
+
+    // Seed with any cached data, then refresh from API
+    setDosenList([...manager.getDistribusiData()]);
+    manager.loadFromApi().catch(console.error);
 
     return () => {
       manager.removeObserver(observer);
