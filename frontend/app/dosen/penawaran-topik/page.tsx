@@ -161,8 +161,9 @@ export default function PenawaranTopikDosenPage() {
       })
       .catch((err) => {
         console.error("Gagal membuat topik:", err);
-        const backendError = err.response?.data?.message || "Gagal menyimpan topik penawaran ke database.";
-        
+        const raw = err.response?.data?.message;
+        const backendError = typeof raw === "string" ? raw : raw && typeof raw === "object" ? String(Object.values(raw)[0]) : "Gagal menyimpan topik penawaran ke database.";
+
         setFailureInfo({
           title: "Gagal Menambahkan Topik",
           message: backendError
@@ -254,7 +255,8 @@ export default function PenawaranTopikDosenPage() {
       })
       .catch((err) => {
         console.error("Gagal memperbarui topik:", err);
-        const backendError = err.response?.data?.message || "Gagal menyimpan perubahan ke database.";
+        const raw = err.response?.data?.message;
+        const backendError = typeof raw === "string" ? raw : raw && typeof raw === "object" ? String(Object.values(raw)[0]) : "Gagal menyimpan perubahan ke database.";
 
         setFailureInfo({
           title: "Gagal Memperbarui Topik",

@@ -67,6 +67,7 @@ export default function UserPage() {
   const [rejectingId, setRejectingId] = useState<number | null>(null);
   const [resettingId, setResettingId] = useState<number | null>(null);
   const [modal, setModal] = useState<ModalState | null>(null);
+  const [acceptRole, setAcceptRole] = useState("mahasiswa");
 
   useEffect(() => {
     api
@@ -97,9 +98,13 @@ export default function UserPage() {
   const handleAccept = async (user: UserRow) => {
     setSavingId(user.id);
     try {
-      await api.post(`/auth/users/${user.id}/approve/`, { role: user.role });
+      await api.post(`/auth/users/${user.id}/approve/`, { role: acceptRole });
       setUsers((prev) =>
-        prev.map((u) => u.id === user.id ? { ...u, isActive: true } : u)
+        prev.map((u) =>
+          u.id === user.id
+            ? { ...u, isActive: true, role: acceptRole, displayRole: ROLE_DISPLAY[acceptRole] ?? acceptRole }
+            : u
+        )
       );
     } catch (err) {
       console.error("Gagal menyetujui akun:", err);
@@ -254,7 +259,7 @@ export default function UserPage() {
                   {!user.isActive ? (
                     <>
                       <button
-                        onClick={() => setModal({ action: "accept", user })}
+                        onClick={() => { setAcceptRole("mahasiswa"); setModal({ action: "accept", user }); }}
                         disabled={savingId === user.id}
                         title="Terima"
                         className="w-10 h-10 rounded-xl bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white flex items-center justify-center transition"
@@ -337,7 +342,21 @@ export default function UserPage() {
                 <h2 className="text-lg font-bold text-[#355872]">{modalConfig.title}</h2>
                 <p className="text-gray-500 text-sm mt-1">
                   {modal.action === "accept" && (
-                    <>Terima akun <span className="font-semibold text-[#355872]">{modal.user.nama}</span>? Pengguna akan dapat login ke sistem.</>
+                    <>
+                      Terima akun <span className="font-semibold text-[#355872]">{modal.user.nama}</span>? Tentukan role untuk pengguna ini.
+                      <div className="mt-3">
+                        <label className="block text-xs font-semibold text-[#355872] mb-1.5">Assign Role</label>
+                        <select
+                          value={acceptRole}
+                          onChange={(e) => setAcceptRole(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-[#d9e6f0] text-[#355872] bg-white outline-none text-sm"
+                        >
+                          {availableRoles.map((r) => (
+                            <option key={r} value={DISPLAY_TO_ROLE[r]}>{r}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
                   )}
                   {modal.action === "reject" && (
                     <>Tolak dan hapus akun <span className="font-semibold text-[#355872]">{modal.user.nama}</span>? Tindakan ini tidak dapat dibatalkan.</>

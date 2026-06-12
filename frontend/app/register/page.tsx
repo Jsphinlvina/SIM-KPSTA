@@ -3,16 +3,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { User, Lock, Eye, EyeOff, Mail, Hash } from "lucide-react";
+import { User, Lock, Eye, EyeOff, Hash } from "lucide-react";
 import api from "../api";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [nimNip, setNimNip] = useState("");
   const [nama, setNama] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"mahasiswa" | "dosen" | "koordinator" | "kaprodi" | "admin">("mahasiswa");
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,16 +26,13 @@ export default function RegisterPage() {
       const response = await api.post("/auth/register/", {
         nim_nip: nimNip,
         nama_lengkap: nama,
-        email,
         password,
-        role,
       });
 
       if (response.data.success) {
         setSuccessMsg("Pendaftaran berhasil! Akun Anda menunggu persetujuan admin sebelum bisa login.");
         setNimNip("");
         setNama("");
-        setEmail("");
         setPassword("");
       }
     } catch (err: any) {
@@ -92,19 +87,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Email */}
-          <div className="relative">
-            <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#355872]" />
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full h-12 rounded-full border border-[#355872] bg-white pl-12 pr-4 outline-none text-[#355872] placeholder:text-gray-500 focus:border-[#7AAACE] focus:ring-2 focus:ring-[#355872] transition"
-            />
-          </div>
-
           {/* Password */}
           <div className="relative">
             <Lock size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#355872]" />
@@ -124,19 +106,6 @@ export default function RegisterPage() {
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
-
-          {/* Role */}
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value as typeof role)}
-            className="w-full h-12 rounded-full border border-[#355872] bg-white px-6 outline-none text-[#355872] focus:border-[#7AAACE] transition"
-          >
-            <option value="mahasiswa">Mahasiswa</option>
-            <option value="dosen">Dosen</option>
-            <option value="koordinator">Koordinator KP</option>
-            <option value="kaprodi">Kaprodi</option>
-            <option value="admin">Admin</option>
-          </select>
 
           {errorMsg && (
             <p className="text-red-500 text-sm text-center font-medium">{errorMsg}</p>

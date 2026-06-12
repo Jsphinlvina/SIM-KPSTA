@@ -103,8 +103,7 @@ class TopikViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(topik)
             return ok(data=serializer.data, message="Topik penawaran baru berhasil disiarkan.")
         except Exception as e:
-            error_msg = e.detail if hasattr(e, 'detail') else str(e)
-            return fail(message=error_msg)
+            return fail(message=_extract_error(e))
 
     @action(detail=False, methods=['get'], url_path='available')
     def available_topik(self, request):

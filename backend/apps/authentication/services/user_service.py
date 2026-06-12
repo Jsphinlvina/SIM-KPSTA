@@ -14,12 +14,14 @@ class UserService:
 
     @staticmethod
     def register_user(data):
+        nim_nip = data['nim_nip']
+        email = data.get('email') or f"{nim_nip}@sim-kpsta.local"
         user = Users.objects.create_user(
-            nim_nip=data['nim_nip'],
-            email=data['email'],
+            nim_nip=nim_nip,
+            email=email,
             password=data['password'],
             nama_lengkap=data['nama_lengkap'],
-            role=data['role'],
+            role='',
         )
         user.is_active = False
         user.save()

@@ -65,7 +65,7 @@ class AuthController(viewsets.ViewSet):
         url_path="register",
     )
     def register(self, request):
-        required = ['nim_nip', 'nama_lengkap', 'email', 'password', 'role']
+        required = ['nim_nip', 'nama_lengkap', 'password']
         for field in required:
             if not request.data.get(field):
                 return fail(
@@ -75,8 +75,6 @@ class AuthController(viewsets.ViewSet):
         from apps.authentication.models import Users
         if Users.objects.filter(nim_nip=request.data['nim_nip']).exists():
             return fail(message="NIM/NIP sudah terdaftar.", status=status.HTTP_400_BAD_REQUEST)
-        if Users.objects.filter(email=request.data['email']).exists():
-            return fail(message="Email sudah terdaftar.", status=status.HTTP_400_BAD_REQUEST)
 
         user = UserService.register_user(request.data)
         return ok(
