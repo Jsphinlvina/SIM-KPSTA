@@ -9,6 +9,7 @@ import {
   BookOpen,
   Bell,
   LogOut,
+  History,
 } from "lucide-react";
 import api from "../api";
 import NotificationPopup from "./notifikasi/page";
@@ -114,7 +115,7 @@ export default function DashboardDosenLading() {
         </h1>
 
         {/* Cards */}
-        <div className="flex items-center justify-center gap-10">
+        <div className="flex items-center justify-center flex-wrap gap-8">
           {/* DASHBOARD */}
           <Link href="/dosen/dashboard">
             <div
@@ -213,6 +214,49 @@ export default function DashboardDosenLading() {
                 <p className="text-gray-500 mt-3 text-lg">
                   Persetujuan bimbingan
                 </p>
+              </div>
+            </div>
+          </Link>
+
+          {/* RIWAYAT BIMBINGAN */}
+          <Link href="/dosen/riwayat-bimbingan">
+            <div
+              className="
+                w-72
+                h-72
+                rounded-3xl
+                bg-white
+                border
+                border-[#dbe9f4]
+                shadow-sm
+                hover:shadow-xl
+                hover:-translate-y-2
+                transition
+                flex
+                flex-col
+                items-center
+                justify-center
+                gap-8
+                cursor-pointer
+              "
+            >
+              <div
+                className="
+                  w-28
+                  h-28
+                  rounded-3xl
+                  bg-[#EAF4FB]
+                  flex
+                  items-center
+                  justify-center
+                  text-[#355872]
+                "
+              >
+                <History size={48} />
+              </div>
+              <div className="text-center">
+                <h2 className="text-4xl font-bold text-[#355872]">Riwayat</h2>
+                <p className="text-gray-500 mt-3 text-lg">Riwayat bimbingan</p>
               </div>
             </div>
           </Link>

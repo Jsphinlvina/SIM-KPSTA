@@ -5,26 +5,38 @@ import { ArrowLeft, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
 import DetailMahasiswa from "./detail-mahasiswa";
 import { DistribusiDataManager, DosenDistribusi, IDistribusiObserver } from "./distribusi-data";
+import api from "../../api";
 
 export default function DistribusiDosenPage() {
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedDosen, setSelectedDosen] = useState("");
   const [dosenList, setDosenList] = useState<DosenDistribusi[]>([]);
+  const [activePeriode, setActivePeriode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    api.get("/topik/periode-semester/active/")
+      .then((res) => {
+        if (res.data.success) setActivePeriode(res.data.data?.nama_periode ?? null);
+      })
+      .catch(() => setActivePeriode(null));
+
     const manager = DistribusiDataManager.getInstance();
 
     // Concrete Observer (registered before loadFromApi so first notify is caught)
     const observer: IDistribusiObserver = {
       onDistribusiChanged(updatedData) {
         setDosenList([...updatedData]);
+        setLoading(false);
       },
     };
     manager.registerObserver(observer);
 
     // Seed with any cached data, then refresh from API
     setDosenList([...manager.getDistribusiData()]);
-    manager.loadFromApi().catch(console.error);
+    manager.loadFromApi()
+      .catch(console.error)
+      .finally(() => setLoading(false));
 
     return () => {
       manager.removeObserver(observer);
@@ -75,7 +87,7 @@ export default function DistribusiDosenPage() {
             shadow-sm
           "
         >
-          Genap 2025/2026
+          {activePeriode ?? "Tidak ada periode aktif"}
         </div>
       </div>
 
@@ -109,67 +121,42 @@ export default function DistribusiDosenPage() {
         </div>
 
         {/* Body */}
-        {dosenList.map((dosen, index) => (
-          <div
-            key={dosen.id}
-            className="
-              grid
-              grid-cols-[100px_1fr_250px_150px]
-              items-center
-              px-8
-              py-6
-              border-t
-              border-[#eef4f8]
-            "
-          >
-            <div className="font-medium text-[#355872]">
-              {index + 1}
-            </div>
-
-            <div className="font-medium text-[#355872]">
-              {dosen.nama}
-            </div>
-
-            <div>
-              <span
-                className="
-                  px-4
-                  py-2
-                  rounded-full
-                  bg-[#EAF4FB]
-                  text-[#355872]
-                  font-medium
-                "
-              >
-                {dosen.jumlahMahasiswa} Mahasiswa
-              </span>
-            </div>
-
-            <div>
-              <button
-                onClick={() => {
-                  setSelectedDosen(dosen.nama);
-                  setOpenDetail(true);
-                }}
-                className="
-                  w-12
-                  h-12
-                  rounded-xl
-                  bg-[#355872]
-                  hover:bg-[#7AAACE]
-                  text-white
-                  flex
-                  items-center
-                  justify-center
-                  transition
-                  cursor-pointer
-                "
-              >
-                <Eye size={20} />
-              </button>
-            </div>
+        {loading ? (
+          <div className="px-8 py-12 text-center text-gray-400 font-medium">Memuat data...</div>
+        ) : dosenList.length === 0 ? (
+          <div className="px-8 py-12 text-center text-gray-500 font-medium">
+            Belum ada data distribusi bimbingan.
           </div>
-        ))}
+        ) : (
+          dosenList.map((dosen, index) => (
+            <div
+              key={dosen.id}
+              className="grid grid-cols-[100px_1fr_250px_150px] items-center px-8 py-6 border-t border-[#eef4f8]"
+            >
+              <div className="font-medium text-[#355872]">{index + 1}</div>
+
+              <div className="font-medium text-[#355872]">{dosen.nama}</div>
+
+              <div>
+                <span className="px-4 py-2 rounded-full bg-[#EAF4FB] text-[#355872] font-medium">
+                  {dosen.jumlahMahasiswa} Mahasiswa
+                </span>
+              </div>
+
+              <div>
+                <button
+                  onClick={() => {
+                    setSelectedDosen(dosen.nama);
+                    setOpenDetail(true);
+                  }}
+                  className="w-12 h-12 rounded-xl bg-[#355872] hover:bg-[#7AAACE] text-white flex items-center justify-center transition cursor-pointer"
+                >
+                  <Eye size={20} />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Detail Mahasiswa */}

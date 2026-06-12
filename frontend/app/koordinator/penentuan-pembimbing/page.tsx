@@ -25,10 +25,16 @@ export default function PenentuanDosenPembimbingPage() {
 
   const [dosenList, setDosenList] = useState<Dosen[]>([]);
   const [rows, setRows] = useState<MahasiswaRowContext[]>([]);
-  // NIM map: pengajuan_id → nim_mahasiswa
   const [nimsMap, setNimsMap] = useState<Record<number, string>>({});
+  const [activePeriode, setActivePeriode] = useState<string | null>(null);
 
   useEffect(() => {
+    api.get("/topik/periode-semester/active/")
+      .then((res) => {
+        if (res.data.success) setActivePeriode(res.data.data?.nama_periode ?? null);
+      })
+      .catch(() => setActivePeriode(null));
+
     const fetchAll = async () => {
       try {
         // Fetch submitted pengajuan and dosen list in parallel
@@ -43,9 +49,12 @@ export default function PenentuanDosenPembimbingPage() {
           pengajuanRes.data.data ??
           [];
 
-        // Only show submitted pengajuan (awaiting coordinator review)
+        // Only show mandiri pengajuan (submitted, no topik, no proses started yet)
         const pending = allPengajuan.filter(
-          (p: any) => p.status_pengajuan === "submitted"
+          (p: any) =>
+            p.status_pengajuan === "submitted" &&
+            !p.topik &&
+            !p.has_proses
         );
 
         // Build nim map: pengajuan_kp_id → nim_nip
@@ -102,20 +111,17 @@ export default function PenentuanDosenPembimbingPage() {
         console.log("Chain of Responsibility Logs:", chainResult.logs);
       }
 
-      // 2. Approve the pengajuan
-      await api.post(`/pengajuan/${pengajuanId}/approve/`);
-
-      // 3. Start bimbingan chain (assigns supervisor)
+      // 2. Start bimbingan chain (assigns supervisor, creates ProsesPenentuan at 'dosen' stage)
       await api.post(`/bimbingan/start-process/${pengajuanId}/`, {
         dosen_id: dosenId,
       });
 
-      // 4. State transition (local)
+      // 3. State transition (local)
       if (targetRow) {
         targetRow.assign(dosenId);
       }
 
-      // 5. Update DistribusiDataManager Singleton
+      // 4. Update DistribusiDataManager Singleton
       try {
         const manager = DistribusiDataManager.getInstance();
         const dosenObj = dosenList.find((d) => d.id === dosenId);
@@ -151,19 +157,6 @@ export default function PenentuanDosenPembimbingPage() {
     }
   };
 
-  const handleRevisi = async (pengajuanId: number) => {
-    try {
-      await api.post(`/pengajuan/${pengajuanId}/revise/`, { catatan: "Mohon perbaiki pengajuan Anda." });
-      setRows((prev) => prev.filter((r) => r.id !== pengajuanId));
-      setToast("Pengajuan dikembalikan ke mahasiswa untuk revisi.");
-      setTimeout(() => setToast(null), 2500);
-    } catch (err: any) {
-      const msg = err.response?.data?.message || "Gagal merevisi pengajuan.";
-      setToast(msg);
-      setTimeout(() => setToast(null), 2500);
-    }
-  };
-
   const pembimbingLabel = (pembimbingId?: number) => {
     if (!pembimbingId) return "Belum ditetapkan";
     return dosenList.find((d) => d.id === pembimbingId)?.nama ?? "";
@@ -184,13 +177,13 @@ export default function PenentuanDosenPembimbingPage() {
               Penentuan Dosen Pembimbing
             </h1>
             <p className="text-gray-500 mt-2">
-              Menentukan dosen pembimbing untuk mahasiswa yang telah disetujui.
+              Tetapkan dosen pembimbing untuk mahasiswa yang mengajukan topik mandiri.
             </p>
           </div>
         </div>
 
         <div className="px-5 py-3 bg-white rounded-xl border border-[#dbe9f4] text-[#355872] font-semibold text-sm shadow-sm">
-          Genap 2025/2026
+          {activePeriode ?? "Tidak ada periode aktif"}
         </div>
       </div>
 
@@ -249,13 +242,6 @@ export default function PenentuanDosenPembimbingPage() {
                 </div>
 
                 <div className="col-span-2 flex justify-center gap-2 flex-wrap">
-                  <button
-                    onClick={() => handleRevisi(row.id)}
-                    disabled={!!row.pembimbingId || savingId === row.id}
-                    className="px-3 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-100 hover:bg-amber-100 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-bold cursor-pointer transition"
-                  >
-                    Revisi
-                  </button>
                   <button
                     onClick={() => handleTolak(row.id)}
                     disabled={!!row.pembimbingId || savingId === row.id}

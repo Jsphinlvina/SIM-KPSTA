@@ -13,6 +13,7 @@ type TopicItem = {
   quota: number;
   desc: string;
   topik_id?: number;
+  periode?: string;
 };
 
 type HistoryItem = {
@@ -20,6 +21,7 @@ type HistoryItem = {
   title: string;
   lecturer: string;
   status: string;
+  periodeId?: number;
 };
 
 export default function ListTopikPage() {
@@ -27,6 +29,7 @@ export default function ListTopikPage() {
   const [activeTab, setActiveTab] = useState("topik");
   const [topics, setTopics] = useState<TopicItem[]>([]);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [activePeriodeId, setActivePeriodeId] = useState<number | null>(null);
 
   // Selection modal state
   const [selectedTopic, setSelectedTopic] = useState<TopicItem | null>(null);
@@ -37,49 +40,20 @@ export default function ListTopikPage() {
   const fetchTopics = () => {
     api.get("/topik/available/")
       .then((res) => {
-        if (res.data.success && res.data.data.length > 0) {
-          const mapped = res.data.data.map((item: any) => ({
+        if (res.data.success) {
+          const mapped = (res.data.data ?? []).map((item: any) => ({
             title: item.judul,
             lecturer: item.dosen_detail ? item.dosen_detail.nama_lengkap : "Tidak diketahui",
             quota: item.kuota,
             desc: item.deskripsi,
             topik_id: item.topik_id,
+            periode: item.periode_detail?.nama_periode ?? "-",
           }));
           setTopics(mapped);
-        } else {
-          // Fallback if no backend topics found
-          setTopics([
-            {
-              title: "Sistem Deteksi ASD Menggunakan Deep Learning",
-              lecturer: "Dr. Meliana, S.Kom",
-              quota: 5,
-              desc: "Penelitian deteksi Autism Spectrum Disorder berbasis AI.",
-            },
-            {
-              title: "Website Monitoring IoT",
-              lecturer: "Budi Santoso, M.Kom",
-              quota: 3,
-              desc: "Monitoring sensor IoT menggunakan dashboard web.",
-            },
-          ]);
         }
       })
       .catch((err) => {
         console.error("Gagal mengambil daftar topik:", err);
-        setTopics([
-          {
-            title: "Sistem Deteksi ASD Menggunakan Deep Learning",
-            lecturer: "Dr. Meliana, S.Kom",
-            quota: 5,
-            desc: "Penelitian deteksi Autism Spectrum Disorder berbasis AI.",
-          },
-          {
-            title: "Website Monitoring IoT",
-            lecturer: "Budi Santoso, M.Kom",
-            quota: 3,
-            desc: "Monitoring sensor IoT menggunakan dashboard web.",
-          },
-        ]);
       });
   };
 
@@ -90,8 +64,9 @@ export default function ListTopikPage() {
           const mapped = res.data.data.map((item: any) => ({
             id: item.pengajuan_kp_id,
             title: item.judul_diajukan,
-            lecturer: item.topik?.dosen_detail ? item.topik.dosen_detail.nama_lengkap : "Jalur Mandiri / Usulan Sendiri",
+            lecturer: item.topik_detail?.dosen_detail?.nama_lengkap ?? "Jalur Mandiri / Usulan Sendiri",
             status: item.status_pengajuan,
+            periodeId: item.periode_detail?.periode_semester_id ?? null,
           }));
           setHistory(mapped);
         }
@@ -102,11 +77,20 @@ export default function ListTopikPage() {
   };
 
   useEffect(() => {
+    api.get("/topik/periode-semester/active/")
+      .then((res) => {
+        if (res.data.success) setActivePeriodeId(res.data.data?.periode_semester_id ?? null);
+      })
+      .catch(() => {});
     fetchTopics();
     fetchHistory();
   }, []);
 
-  const hasActiveSubmission = history.some((item) => item.status !== "rejected");
+  const hasActiveSubmission = history.some(
+    (item) =>
+      (item.status === "submitted" || item.status === "approved") &&
+      item.periodeId === activePeriodeId
+  );
 
   const handleOpenProposal = (topic: TopicItem) => {
     setSelectedTopic(topic);
@@ -132,9 +116,8 @@ export default function ListTopikPage() {
     setProposalError(null);
 
     try {
-      const response = await api.post("/pengajuan/", {
+      const response = await api.post("/pengajuan/topik-dosen/", {
         topik: selectedTopic.topik_id,
-        judul_diajukan: selectedTopic.title,
         deskripsi_sistem: deskripsiSistem.trim(),
       });
 
@@ -266,6 +249,13 @@ export default function ListTopikPage() {
             </thead>
 
             <tbody className="divide-y divide-[#eef4f8]">
+              {topics.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-gray-500 font-medium">
+                    Belum ada topik yang tersedia untuk periode ini.
+                  </td>
+                </tr>
+              )}
               {topics.map((item, index) => (
                 <tr
                   key={index}
@@ -279,6 +269,11 @@ export default function ListTopikPage() {
                       <p className="text-sm text-gray-500 mt-1 font-medium leading-relaxed">
                         {item.desc}
                       </p>
+                      {item.periode && (
+                        <span className="inline-flex items-center mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EAF4FB] text-[#355872]">
+                          {item.periode}
+                        </span>
+                      )}
                     </div>
                   </td>
 
@@ -361,22 +356,22 @@ export default function ListTopikPage() {
                           font-bold
                           border
                           ${
-                            item.status.toLowerCase() === "disetujui"
+                            item.status === "approved"
                               ? "bg-green-50 text-green-700 border-green-150"
-                              : item.status.toLowerCase() === "ditolak"
+                              : item.status === "rejected"
                               ? "bg-red-50 text-red-700 border-red-150"
                               : "bg-amber-50 text-amber-700 border-amber-150"
                           }
                         `}
                       >
                         <span className={`w-1.5 h-1.5 rounded-full ${
-                          item.status.toLowerCase() === "disetujui"
+                          item.status === "approved"
                             ? "bg-green-500"
-                            : item.status.toLowerCase() === "ditolak"
+                            : item.status === "rejected"
                             ? "bg-red-500"
                             : "bg-amber-500"
                         }`}></span>
-                        {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                        {item.status === "approved" ? "Disetujui" : item.status === "rejected" ? "Ditolak" : "Menunggu"}
                       </span>
                     </td>
                   </tr>

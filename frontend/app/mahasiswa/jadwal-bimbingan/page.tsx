@@ -21,16 +21,16 @@ interface GuidanceEvent {
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  scheduled: "Terjadwal",
-  ongoing: "Berlangsung",
+  scheduled: "Pengajuan",
+  ongoing: "Diterima",
   completed: "Selesai",
-  cancelled: "Dibatalkan",
+  cancelled: "Ditolak",
 };
 
 const STATUS_CLASS: Record<string, string> = {
-  scheduled: "bg-yellow-100 text-yellow-700",
-  ongoing: "bg-blue-100 text-blue-700",
-  completed: "bg-green-100 text-green-700",
+  scheduled: "bg-amber-100 text-amber-700",
+  ongoing: "bg-green-100 text-green-700",
+  completed: "bg-blue-100 text-blue-700",
   cancelled: "bg-red-100 text-red-600",
 };
 
@@ -63,11 +63,11 @@ export default function JadwalBimbinganPage() {
         if (bimList.length === 0) { setLoading(false); return; }
 
         const bim = bimList[0];
-        setBimbinganId(bim.id);
+        setBimbinganId(bim.bimbingan_id);
         setLecturerId(bim.dosen);
         setDosenNama(bim.dosen_detail?.nama_lengkap ?? "—");
 
-        const guidRes = await api.get(`/guidance/by-bimbingan/${bim.id}/`);
+        const guidRes = await api.get(`/guidance/by-bimbingan/${bim.bimbingan_id}/`);
         const events: any[] = guidRes.data.data || [];
         setHistory(
           events

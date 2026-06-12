@@ -15,11 +15,17 @@ export interface IDistribusiObserver {
   onDistribusiChanged(data: DosenDistribusi[]): void;
 }
 
+export interface MahasiswaBimbingan {
+  nama: string;
+  nim: string;
+  topik: string;
+}
+
 export interface DosenDistribusi {
   id: number;
   nama: string;
   jumlahMahasiswa: number;
-  mahasiswaList: string[];
+  mahasiswaList: MahasiswaBimbingan[];
 }
 
 export class DistribusiDataManager {
@@ -27,57 +33,7 @@ export class DistribusiDataManager {
   private observers: IDistribusiObserver[] = [];
   private data: DosenDistribusi[] = [];
 
-  private constructor() {
-    // Inisialisasi mock data beban bimbingan dosen
-    this.data = [
-      {
-        id: 1,
-        nama: "Budi Santoso, S.Kom, M.T",
-        jumlahMahasiswa: 8,
-        mahasiswaList: [
-          "Andi Saputra",
-          "Eka Pratama",
-          "Fajar Siddiq",
-          "Gita Cahyani",
-          "Hendra Kusuma",
-          "Indah Lestari",
-          "Joko Susilo",
-          "Kiki Amalia",
-        ],
-      },
-      {
-        id: 2,
-        nama: "Siti Aisyah, S.Si, M.Kom",
-        jumlahMahasiswa: 6,
-        mahasiswaList: [
-          "Citra Lestari",
-          "Lutfi Hakim",
-          "Murni Sari",
-          "Nabila Putri",
-          "Oki Setiawan",
-          "Putri Rahayu",
-        ],
-      },
-      {
-        id: 3,
-        nama: "Rizky Maulana, M.Sc",
-        jumlahMahasiswa: 5,
-        mahasiswaList: [
-          "Rian Aditama",
-          "Santi Widiastuti",
-          "Taufik Hidayat",
-          "Ulfa Fauziah",
-          "Vina Amelia",
-        ],
-      },
-      {
-        id: 4,
-        nama: "Andi Setiawan, M.T",
-        jumlahMahasiswa: 3,
-        mahasiswaList: ["Wahyu Hidayat", "Yusuf Subagja", "Zainal Abidin"],
-      },
-    ];
-  }
+  private constructor() {}
 
   public static getInstance(): DistribusiDataManager {
     if (!DistribusiDataManager.instance) {
@@ -104,7 +60,7 @@ export class DistribusiDataManager {
     }
   }
 
-  // --- DATA MUTATORS ---
+  // --- DATA ACCESSORS ---
 
   public getDistribusiData(): DosenDistribusi[] {
     return this.data;
@@ -118,7 +74,11 @@ export class DistribusiDataManager {
         id: parseInt(dosen_id),
         nama: info.nama_dosen,
         jumlahMahasiswa: info.jumlah_mahasiswa,
-        mahasiswaList: (info.mahasiswa as any[]).map((m) => m.nama),
+        mahasiswaList: (info.mahasiswa as any[]).map((m) => ({
+          nama: m.nama,
+          nim: m.nim,
+          topik: m.topik,
+        })),
       }));
       this.notifyObservers();
     }
@@ -126,16 +86,16 @@ export class DistribusiDataManager {
 
   public addMahasiswaToDosen(dosenNama: string, mahasiswaNama: string): void {
     const target = this.data.find(
-      (d) => d.nama.toLowerCase().includes(dosenNama.toLowerCase()) || 
-             dosenNama.toLowerCase().includes(d.nama.toLowerCase())
+      (d) =>
+        d.nama.toLowerCase().includes(dosenNama.toLowerCase()) ||
+        dosenNama.toLowerCase().includes(d.nama.toLowerCase())
     );
 
     if (target) {
-      // Pastikan mahasiswa tidak ditambahkan dua kali
-      if (!target.mahasiswaList.includes(mahasiswaNama)) {
-        target.mahasiswaList.push(mahasiswaNama);
+      const alreadyExists = target.mahasiswaList.some((m) => m.nama === mahasiswaNama);
+      if (!alreadyExists) {
+        target.mahasiswaList.push({ nama: mahasiswaNama, nim: "", topik: "" });
         target.jumlahMahasiswa = target.mahasiswaList.length;
-        console.log(`[Singleton] Menambahkan mahasiswa ${mahasiswaNama} ke pembimbing ${dosenNama}.`);
         this.notifyObservers();
       }
     }

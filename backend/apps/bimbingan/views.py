@@ -46,7 +46,7 @@ class BimbinganViewSet(viewsets.ModelViewSet):
         proses_list = ProsesPenentuan.objects.filter(status='menunggu')
 
         if user.role == 'koordinator':
-            proses_list = proses_list.filter(tahap_chain='koordinator')
+            proses_list = proses_list.filter(tahap_chain='dosen')
         elif user.role == 'dosen':
             proses_list = proses_list.filter(tahap_chain='dosen', dosen_diusulkan=user)
         elif user.role == 'kaprodi':

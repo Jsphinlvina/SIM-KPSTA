@@ -11,6 +11,12 @@ from apps.authentication.patterns.auth_session import AuthSession
 
 class AuthController(viewsets.ViewSet):
 
+    def get_authenticators(self):
+        if getattr(self, 'action', None) in ('login', 'register'):
+            return []
+        from rest_framework_simplejwt.authentication import JWTAuthentication
+        return [JWTAuthentication()]
+
     @action(
         detail=False, methods=["post"], permission_classes=[AllowAny], url_path="login"
     )

@@ -38,7 +38,7 @@ export default function ApprovalPage() {
         // 3. Fetch scheduled guidance events for each bimbingan in parallel
         const scheduleFetches = bimbinganList.map((b: any) =>
           api
-            .get(`/guidance/by-bimbingan/${b.id}/`)
+            .get(`/guidance/by-bimbingan/${b.bimbingan_id}/`)
             .then((r) =>
               (r.data.data || [])
                 .filter((s: any) => s.status === "scheduled")

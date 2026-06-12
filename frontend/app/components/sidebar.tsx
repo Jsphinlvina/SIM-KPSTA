@@ -107,7 +107,9 @@ function SidebarContent({ role }: { role: SidebarRole }) {
     ? pathname === "/dosen/dashboard" ||
       pathname === "/dosen/approval" ||
       pathname === "/dosen/penawaran-topik" ||
-      pathname === "/dosen/kelayakan-pembimbing"
+      pathname === "/dosen/kelayakan-pembimbing" ||
+      pathname === "/dosen/riwayat-bimbingan" ||
+      pathname.startsWith("/dosen/document-review")
     : pathname === "/mahasiswa/list-topik" ||
       pathname === "/mahasiswa/jadwal-bimbingan";
 
@@ -258,6 +260,11 @@ function SidebarContent({ role }: { role: SidebarRole }) {
                     href="/dosen/penawaran-topik"
                     label="Penawaran Topik"
                     active={pathname === "/dosen/penawaran-topik"}
+                  />
+                  <SidebarSubLink
+                    href="/dosen/riwayat-bimbingan"
+                    label="Riwayat Bimbingan"
+                    active={pathname === "/dosen/riwayat-bimbingan"}
                   />
                 </>
               ) : (

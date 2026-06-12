@@ -26,7 +26,7 @@ interface DosenOption {
 }
 
 interface BimbinganOption {
-  id: number;
+  bimbingan_id: number;
   mahasiswa_detail: { user_id: number; nama_lengkap: string; nim_nip: string };
   dosen_detail: { user_id: number; nama_lengkap: string };
 }
@@ -119,7 +119,7 @@ export default function JadwalSidangPage() {
   };
 
   const handleBimbinganChange = (bimId: string) => {
-    const bim = bimbinganList.find((b) => String(b.id) === bimId);
+    const bim = bimbinganList.find((b) => String(b.bimbingan_id) === bimId);
     setForm((prev) => ({
       ...prev,
       bimbingan_aktif_id: bimId,
@@ -213,7 +213,7 @@ export default function JadwalSidangPage() {
               <div className="px-8 py-12 text-center text-gray-500">Belum ada jadwal sidang.</div>
             ) : (
               defenses.map((d, idx) => {
-                const bim = bimbinganList.find((b) => b.id === d.bimbingan_aktif_id);
+                const bim = bimbinganList.find((b) => b.bimbingan_id === d.bimbingan_aktif_id);
                 return (
                   <div
                     key={d.id}
@@ -283,7 +283,7 @@ export default function JadwalSidangPage() {
                 >
                   <option value="">— Pilih Bimbingan —</option>
                   {bimbinganList.map((b) => (
-                    <option key={b.id} value={b.id}>
+                    <option key={b.bimbingan_id} value={b.bimbingan_id}>
                       {b.mahasiswa_detail?.nama_lengkap ?? `Bimbingan #${b.id}`}
                     </option>
                   ))}

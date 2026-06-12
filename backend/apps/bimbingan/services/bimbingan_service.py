@@ -21,15 +21,16 @@ class BimbinganService:
 
     @classmethod
     def start_approval_chain(cls, pengajuan_instance, dosen_usulan):
-        if pengajuan_instance.status_pengajuan != 'approved':
-            raise Exception("Gagal: Proses pembimbing hanya bisa dimulai dari pengajuan KP yang berstatus APPROVED.")
+        if pengajuan_instance.status_pengajuan not in ('submitted', 'approved'):
+            raise Exception("Pengajuan harus berstatus submitted sebelum proses pembimbing dimulai.")
 
         proses, created = ProsesPenentuan.objects.get_or_create(
             pengajuan=pengajuan_instance,
-            defaults={'dosen_diusulkan': dosen_usulan, 'status': 'menunggu', 'tahap_chain': 'koordinator'}
+            defaults={'dosen_diusulkan': dosen_usulan, 'status': 'menunggu', 'tahap_chain': 'dosen'}
         )
         if not created:
             raise Exception("Proses penentuan pembimbing untuk pengajuan ini sudah berjalan.")
+
         return cls(proses)
 
     def execute_approve_step(self, user):
@@ -49,5 +50,10 @@ class BimbinganService:
             raise Exception("Proses penentuan sudah ditutup, tidak bisa ditolak.")
 
         self.state.handle_reject(self, alasan)
+
+        pengajuan = self.proses.pengajuan
+        pengajuan.status_pengajuan = 'rejected'
+        pengajuan.save()
+
         self.set_state_by_status()
         return self.proses

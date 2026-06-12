@@ -1,14 +1,13 @@
 import React from "react";
 import { Users, CheckCircle2, Clock, XCircle, TrendingUp, FileText, Download, FileSpreadsheet } from "lucide-react";
-import Link from "next/link";
 
 /**
  * Design Patterns (FE):
- * 
+ *
  * 1. Template Method Pattern:
  *    - LaporanTemplate (Abstract Class): Mendefinisikan kerangka halaman (Template Method: renderReport()).
  *    - Concrete subclasses meng-override hook renderHeader, renderSummaryCards, renderCharts, dan renderDetailTable.
- * 
+ *
  * 2. Factory Pattern:
  *    - LaporanFactory: Membuat objek laporan (LaporanBulanan atau LaporanSemester) secara dinamis.
  */
@@ -84,7 +83,7 @@ export class LaporanBulanan extends LaporanTemplate {
               Laporan Statistik KP (Bulanan)
             </h1>
             <p className="text-gray-500 mt-2 font-medium">
-              Analisis performa & progres pengajuan bulanan Kerja Praktik
+              Analisis performa &amp; progres pengajuan bulanan Kerja Praktik
             </p>
           </div>
         </div>
@@ -120,10 +119,10 @@ export class LaporanBulanan extends LaporanTemplate {
   protected renderSummaryCards(): React.ReactNode {
     const s = this.props.apiData?.statistik;
     const cards = [
-      { label: "Pengajuan Bulan Ini", value: s?.total_pengajuan ?? 12, sub: "Menunjukkan tren aktif", icon: Clock, color: "bg-amber-50 text-amber-600" },
-      { label: "Disetujui Bulan Ini", value: s?.per_status?.approved ?? 9, sub: `Tingkat persetujuan ${s?.persentase_disetujui ?? 75}%`, icon: CheckCircle2, color: "bg-green-50 text-green-600" },
-      { label: "Bimbingan Aktif", value: s?.per_status?.submitted ?? 48, sub: "Menunggu / aktif", icon: Users, color: "bg-[#EAF4FB] text-[#355872]" },
-      { label: "Ditolak Bulan Ini", value: s?.per_status?.rejected ?? 1, sub: "Butuh revisi topik", icon: XCircle, color: "bg-red-50 text-red-500" },
+      { label: "Total Pengajuan", value: s?.total_pengajuan ?? "-", sub: "Semua status pengajuan", icon: Clock, color: "bg-amber-50 text-amber-600" },
+      { label: "Disetujui", value: s?.per_status?.approved ?? "-", sub: `Tingkat persetujuan ${s?.persentase_disetujui ?? "-"}%`, icon: CheckCircle2, color: "bg-green-50 text-green-600" },
+      { label: "Menunggu Persetujuan", value: s?.per_status?.submitted ?? "-", sub: "Perlu ditindaklanjuti", icon: Users, color: "bg-[#EAF4FB] text-[#355872]" },
+      { label: "Ditolak", value: s?.per_status?.rejected ?? "-", sub: "Butuh revisi topik", icon: XCircle, color: "bg-red-50 text-red-500" },
     ];
 
     return (
@@ -136,7 +135,6 @@ export class LaporanBulanan extends LaporanTemplate {
                 <div className={`p-3 rounded-2xl ${card.color}`}>
                   <Icon size={22} />
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-600">+10% MoM</span>
               </div>
               <div>
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{card.label}</p>
@@ -151,66 +149,74 @@ export class LaporanBulanan extends LaporanTemplate {
   }
 
   protected renderCharts(): React.ReactNode {
-    const monthlyData = [
-      { bulan: "Jan", jumlah: 5 },
-      { bulan: "Feb", jumlah: 8 },
-      { bulan: "Mar", jumlah: 14 },
-      { bulan: "Apr", jumlah: 11 },
-      { bulan: "Mei", jumlah: 7 },
-      { bulan: "Jun", jumlah: 3 },
+    const s = this.props.apiData?.statistik;
+    const statusData = [
+      { label: "Draft", value: s?.per_status?.draft ?? 0, color: "bg-gray-400" },
+      { label: "Menunggu", value: s?.per_status?.submitted ?? 0, color: "bg-amber-400" },
+      { label: "Disetujui", value: s?.per_status?.approved ?? 0, color: "bg-[#355872]" },
+      { label: "Ditolak", value: s?.per_status?.rejected ?? 0, color: "bg-red-400" },
     ];
-    const maxMonthly = Math.max(...monthlyData.map((d) => d.jumlah));
+    const maxVal = Math.max(...statusData.map((d) => d.value), 1);
+
+    const total = s?.total_pengajuan ?? 0;
+    const approved = s?.per_status?.approved ?? 0;
+    const notApproved = total - approved;
+    const approvedPct = total > 0 ? Math.round((approved / total) * 100) : 0;
+    const notApprovedPct = 100 - approvedPct;
 
     return (
       <>
-        {/* Chart 1: Bar Chart Bulanan */}
+        {/* Chart 1: Status Breakdown Bar Chart */}
         <div className="col-span-2 bg-white rounded-3xl border border-[#e6eef5] shadow-sm p-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-xl font-bold text-[#355872]">Tren Pengajuan Bulanan</h2>
-              <p className="text-xs text-gray-400 mt-1 font-medium">Beban kerja mahasiswa KP masuk bulanan</p>
+              <h2 className="text-xl font-bold text-[#355872]">Breakdown Status Pengajuan</h2>
+              <p className="text-xs text-gray-400 mt-1 font-medium">Distribusi status seluruh pengajuan KP</p>
             </div>
             <TrendingUp size={20} className="text-[#355872]" />
           </div>
-          <div className="flex items-end gap-4 h-44">
-            {monthlyData.map((d, i) => {
-              const heightPct = (d.jumlah / maxMonthly) * 100;
+          <div className="flex items-end gap-6 h-44">
+            {statusData.map((d, i) => {
+              const heightPct = (d.value / maxVal) * 100;
               return (
                 <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                  <span className="text-xs font-bold text-[#355872]">{d.jumlah}</span>
+                  <span className="text-xs font-bold text-[#355872]">{d.value}</span>
                   <div className="w-full rounded-t-xl bg-[#EAF4FB] relative overflow-hidden" style={{ height: "140px" }}>
-                    <div className="absolute bottom-0 left-0 right-0 rounded-t-xl bg-[#355872] transition-all duration-700" style={{ height: `${heightPct}%` }} />
+                    <div
+                      className={`absolute bottom-0 left-0 right-0 rounded-t-xl transition-all duration-700 ${d.color}`}
+                      style={{ height: `${heightPct}%` }}
+                    />
                   </div>
-                  <span className="text-xs font-semibold text-gray-400">{d.bulan}</span>
+                  <span className="text-xs font-semibold text-gray-400">{d.label}</span>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* Chart 2: Legend Jenis Topik Bulanan */}
+        {/* Chart 2: Approved vs Others */}
         <div className="bg-white rounded-3xl border border-[#e6eef5] shadow-sm p-8 flex flex-col justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[#355872]">Kategori Topik</h2>
-            <p className="text-xs text-gray-400 mt-1 font-medium">Pilihan jenis topik KP bulan ini</p>
+            <h2 className="text-xl font-bold text-[#355872]">Rasio Persetujuan</h2>
+            <p className="text-xs text-gray-400 mt-1 font-medium">Perbandingan disetujui vs belum</p>
           </div>
           <div className="space-y-4 my-6">
             <div>
               <div className="flex justify-between text-sm font-semibold text-gray-600 mb-1">
-                <span>Topik Dosen (65%)</span>
-                <span>8</span>
+                <span>Disetujui ({approvedPct}%)</span>
+                <span>{approved}</span>
               </div>
               <div className="w-full bg-gray-100 rounded-full h-2">
-                <div className="bg-[#355872] h-2 rounded-full" style={{ width: "65%" }} />
+                <div className="bg-[#355872] h-2 rounded-full" style={{ width: `${approvedPct}%` }} />
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm font-semibold text-gray-600 mb-1">
-                <span>Topik Mandiri (35%)</span>
-                <span>4</span>
+                <span>Belum Disetujui ({notApprovedPct}%)</span>
+                <span>{notApproved}</span>
               </div>
               <div className="w-full bg-gray-100 rounded-full h-2">
-                <div className="bg-[#7AAACE] h-2 rounded-full" style={{ width: "35%" }} />
+                <div className="bg-[#7AAACE] h-2 rounded-full" style={{ width: `${notApprovedPct}%` }} />
               </div>
             </div>
           </div>
@@ -220,29 +226,37 @@ export class LaporanBulanan extends LaporanTemplate {
   }
 
   protected renderDetailTable(): React.ReactNode {
-    const logBimbingan = [
-      { tgl: "01 Jun 2026", nama: "Andi Saputra", detail: "Mengirimkan draft Bab 1 Pendahuluan" },
-      { tgl: "03 Jun 2026", nama: "Budi Hartono", detail: "Verifikasi proposal KP oleh koordinator" },
-      { tgl: "05 Jun 2026", nama: "Citra Lestari", detail: "Penjadwalan sidang disetujui" },
-    ];
+    const distribusiDict = this.props.apiData?.distribusi;
+    const dosenData = distribusiDict
+      ? Object.entries(distribusiDict).map(([, info]) => ({
+          nama: info.nama_dosen,
+          nip: info.nip,
+          jumlah: info.jumlah_mahasiswa,
+        }))
+      : [];
 
     return (
       <div className="bg-white rounded-3xl border border-[#e6eef5] shadow-sm overflow-hidden">
         <div className="px-8 py-6 border-b border-[#f0f5fa] flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[#355872]">Log Aktivitas Bulanan</h2>
-            <p className="text-xs text-gray-400 mt-1 font-medium">Histori pendaftaran & bimbingan mahasiswa terbaru</p>
+            <h2 className="text-xl font-bold text-[#355872]">Beban Bimbingan per Dosen</h2>
+            <p className="text-xs text-gray-400 mt-1 font-medium">Jumlah mahasiswa aktif per pembimbing</p>
           </div>
           <FileText size={20} className="text-gray-300" />
         </div>
-        <div className="divide-y divide-[#eef4f8] px-8">
-          {logBimbingan.map((log, idx) => (
-            <div key={idx} className="py-4 flex items-center justify-between text-sm text-[#355872] font-semibold">
-              <span className="text-gray-400">{log.tgl}</span>
-              <span className="font-bold">{log.nama}</span>
-              <span className="text-gray-500">{log.detail}</span>
+        <div className="divide-y divide-[#eef4f8]">
+          {dosenData.length === 0 ? (
+            <div className="px-8 py-10 text-center text-gray-400 font-medium">
+              Belum ada data bimbingan aktif.
             </div>
-          ))}
+          ) : (
+            dosenData.map((d, i) => (
+              <div key={i} className="px-8 py-4 flex items-center justify-between">
+                <span className="font-bold text-[#355872]">{d.nama}</span>
+                <span className="text-sm font-semibold text-gray-500">{d.jumlah} Mahasiswa</span>
+              </div>
+            ))
+          )}
         </div>
       </div>
     );
@@ -269,7 +283,7 @@ export class LaporanSemester extends LaporanTemplate {
               Laporan Statistik KP (Semester)
             </h1>
             <p className="text-gray-500 mt-2 font-medium">
-              Analisis tren kumulatif & statistik sidang satu semester penuh
+              Analisis tren kumulatif &amp; statistik sidang satu semester penuh
             </p>
           </div>
         </div>
@@ -304,12 +318,11 @@ export class LaporanSemester extends LaporanTemplate {
 
   protected renderSummaryCards(): React.ReactNode {
     const s = this.props.apiData?.statistik;
-    const total = s?.total_pengajuan ?? 48;
     const cards = [
-      { label: "Total Mahasiswa Terdaftar", value: total, sub: "Periode Genap 2025/2026", icon: Users, color: "bg-[#EAF4FB] text-[#355872]" },
-      { label: "Topik Disetujui", value: s?.per_status?.approved ?? 35, sub: `Tingkat persetujuan ${s?.persentase_disetujui ?? 72.9}%`, icon: CheckCircle2, color: "bg-green-50 text-green-600" },
-      { label: "Menunggu Persetujuan", value: s?.per_status?.submitted ?? 9, sub: "Perlu ditindaklanjuti segera", icon: Clock, color: "bg-amber-50 text-amber-600" },
-      { label: "Topik Ditolak", value: s?.per_status?.rejected ?? 4, sub: "Ditinjau kembali", icon: XCircle, color: "bg-red-50 text-red-500" },
+      { label: "Total Mahasiswa Terdaftar", value: s?.total_pengajuan ?? "-", sub: "Semua periode", icon: Users, color: "bg-[#EAF4FB] text-[#355872]" },
+      { label: "Topik Disetujui", value: s?.per_status?.approved ?? "-", sub: `Tingkat persetujuan ${s?.persentase_disetujui ?? "-"}%`, icon: CheckCircle2, color: "bg-green-50 text-green-600" },
+      { label: "Menunggu Persetujuan", value: s?.per_status?.submitted ?? "-", sub: "Perlu ditindaklanjuti segera", icon: Clock, color: "bg-amber-50 text-amber-600" },
+      { label: "Topik Ditolak", value: s?.per_status?.rejected ?? "-", sub: "Ditinjau kembali", icon: XCircle, color: "bg-red-50 text-red-500" },
     ];
 
     return (
@@ -322,7 +335,6 @@ export class LaporanSemester extends LaporanTemplate {
                 <div className={`p-3 rounded-2xl ${card.color}`}>
                   <Icon size={22} />
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-600">+12% YoY</span>
               </div>
               <div>
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{card.label}</p>
@@ -337,52 +349,69 @@ export class LaporanSemester extends LaporanTemplate {
   }
 
   protected renderCharts(): React.ReactNode {
-    const totalReal = this.props.apiData?.statistik?.total_pengajuan ?? 48;
-    const approved = this.props.apiData?.statistik?.per_status?.approved ?? 28;
-    const pending = totalReal - approved;
+    const total = this.props.apiData?.statistik?.total_pengajuan ?? 0;
+    const approved = this.props.apiData?.statistik?.per_status?.approved ?? 0;
+    const notApproved = total - approved;
+    const approvedPct = this.props.apiData?.statistik?.persentase_disetujui ?? 0;
     const breakdown = [
       { label: "Topik Disetujui", value: approved, color: "#355872" },
-      { label: "Belum Disetujui", value: pending, color: "#7AAACE" },
+      { label: "Belum Disetujui", value: notApproved, color: "#7AAACE" },
     ];
-    const total = totalReal;
 
     return (
       <>
         {/* Chart 1: Donut diagram */}
         <div className="col-span-2 bg-white rounded-3xl border border-[#e6eef5] shadow-sm p-8 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[#355872]">Distribusi Jenis Topik</h2>
-            <p className="text-xs text-gray-400 mt-1 font-medium">Rasio pengajuan topik bimbingan</p>
+            <h2 className="text-xl font-bold text-[#355872]">Distribusi Status Pengajuan</h2>
+            <p className="text-xs text-gray-400 mt-1 font-medium">Rasio pengajuan yang disetujui vs belum</p>
             <div className="space-y-3 mt-6">
               {breakdown.map((seg, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: seg.color }} />
                   <span className="text-sm font-semibold text-gray-600">
-                    {seg.label}: <strong>{seg.value}</strong> ({Math.round((seg.value / total) * 100)}%)
+                    {seg.label}: <strong>{seg.value}</strong>{" "}
+                    ({total > 0 ? Math.round((seg.value / total) * 100) : 0}%)
                   </span>
                 </div>
               ))}
             </div>
           </div>
-          {/* Custom SVG render */}
           <div className="relative">
             <svg width="140" height="140" viewBox="0 0 160 160">
-              <circle cx="80" cy="80" r="60" fill="none" stroke="#355872" strokeWidth="20" strokeDasharray="230 147" style={{ transform: "rotate(-90deg)", transformOrigin: "center" }} />
-              <circle cx="80" cy="80" r="60" fill="none" stroke="#7AAACE" strokeWidth="20" strokeDasharray="147 230" strokeDashoffset="-230" style={{ transform: "rotate(-90deg)", transformOrigin: "center" }} />
-              <text x="80" y="86" textAnchor="middle" className="text-2xl" fontSize="22" fontWeight="bold" fill="#355872">{total}</text>
+              <circle
+                cx="80" cy="80" r="60" fill="none" stroke="#355872" strokeWidth="20"
+                strokeDasharray={`${(approved / (total || 1)) * 377} 377`}
+                style={{ transform: "rotate(-90deg)", transformOrigin: "center" }}
+              />
+              <circle
+                cx="80" cy="80" r="60" fill="none" stroke="#7AAACE" strokeWidth="20"
+                strokeDasharray={`${(notApproved / (total || 1)) * 377} 377`}
+                strokeDashoffset={`-${(approved / (total || 1)) * 377}`}
+                style={{ transform: "rotate(-90deg)", transformOrigin: "center" }}
+              />
+              <text x="80" y="86" textAnchor="middle" fontSize="22" fontWeight="bold" fill="#355872">{total}</text>
             </svg>
           </div>
         </div>
 
-        {/* Chart 2: Ringkasan Kelulusan Sidang */}
+        {/* Chart 2: Tingkat Persetujuan */}
         <div className="bg-white rounded-3xl border border-[#e6eef5] shadow-sm p-8 flex flex-col justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[#355872]">Kelulusan Sidang</h2>
-            <p className="text-xs text-gray-400 mt-1 font-medium">Statistik mahasiswa lulus sidang KP</p>
+            <h2 className="text-xl font-bold text-[#355872]">Tingkat Persetujuan</h2>
+            <p className="text-xs text-gray-400 mt-1 font-medium">Persentase pengajuan yang disetujui</p>
           </div>
           <div className="text-center my-4">
-            <h3 className="text-4xl font-extrabold text-[#355872]">94.2%</h3>
-            <p className="text-xs text-green-600 font-bold mt-1">Sangat Memuaskan</p>
+            {total > 0 ? (
+              <>
+                <h3 className="text-4xl font-extrabold text-[#355872]">{approvedPct}%</h3>
+                <p className={`text-xs font-bold mt-1 ${approvedPct >= 70 ? "text-green-600" : "text-amber-500"}`}>
+                  {approvedPct >= 70 ? "Sangat Baik" : "Perlu Perhatian"}
+                </p>
+              </>
+            ) : (
+              <p className="text-gray-400 font-medium text-sm">Belum ada data pengajuan.</p>
+            )}
           </div>
         </div>
       </>
@@ -397,29 +426,30 @@ export class LaporanSemester extends LaporanTemplate {
           nip: info.nip,
           jumlah: info.jumlah_mahasiswa,
         }))
-      : [
-          { nama: "Dr. Budi Santoso, M.T.", nip: "72001", jumlah: 9 },
-          { nama: "Siti Aisyah, S.Si, M.Kom", nip: "72002", jumlah: 7 },
-          { nama: "Rizky Maulana, M.Sc", nip: "72003", jumlah: 6 },
-          { nama: "Dewi Permata, M.T.", nip: "72004", jumlah: 5 },
-        ];
+      : [];
 
     return (
       <div className="bg-white rounded-3xl border border-[#e6eef5] shadow-sm overflow-hidden">
         <div className="px-8 py-6 border-b border-[#f0f5fa] flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-[#355872]">Beban Bimbingan per Dosen (Semester)</h2>
-            <p className="text-xs text-gray-400 mt-1 font-medium">Jumlah bimbingan semester ini</p>
+            <p className="text-xs text-gray-400 mt-1 font-medium">Jumlah bimbingan aktif semester ini</p>
           </div>
           <FileText size={20} className="text-gray-300" />
         </div>
         <div className="divide-y divide-[#eef4f8]">
-          {dosenData.map((d, i) => (
-            <div key={i} className="px-8 py-4 flex items-center justify-between">
-              <span className="font-bold text-[#355872]">{d.nama}</span>
-              <span className="text-sm font-semibold text-gray-500">{d.jumlah} Mahasiswa</span>
+          {dosenData.length === 0 ? (
+            <div className="px-8 py-10 text-center text-gray-400 font-medium">
+              Belum ada data bimbingan aktif.
             </div>
-          ))}
+          ) : (
+            dosenData.map((d, i) => (
+              <div key={i} className="px-8 py-4 flex items-center justify-between">
+                <span className="font-bold text-[#355872]">{d.nama}</span>
+                <span className="text-sm font-semibold text-gray-500">{d.jumlah} Mahasiswa</span>
+              </div>
+            ))
+          )}
         </div>
       </div>
     );
