@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from core.responses import ok, fail
-from core.permissions import IsDosen, IsAdmin
+from core.permissions import IsDosen, IsAdmin, IsDosenOrKoordinator
 
 
 def _extract_error(e):
@@ -94,7 +94,7 @@ class TopikViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy', 'by_dosen']:
-            return [IsAuthenticated(), IsDosen()]
+            return [IsAuthenticated(), IsDosenOrKoordinator()]
         return [IsAuthenticated()]
 
     def create(self, request, *args, **kwargs):
@@ -102,6 +102,32 @@ class TopikViewSet(viewsets.ModelViewSet):
             topik = TopikService.create_topik_penawaran(request.data, request.user)
             serializer = self.get_serializer(topik)
             return ok(data=serializer.data, message="Topik penawaran baru berhasil disiarkan.")
+        except Exception as e:
+            return fail(message=_extract_error(e))
+
+    def update(self, request, *args, **kwargs):
+        try:
+            topik = self.get_object()
+            serializer = self.get_serializer(topik, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            data = serializer.validated_data
+            if 'user' not in data:
+                data['user'] = topik.user
+            topik.__dict__.update({k: v for k, v in data.items() if k != 'user'})
+            topik.user = data['user']
+            topik.save()
+            return ok(data=self.get_serializer(topik).data, message="Topik berhasil diperbarui.")
+        except Exception as e:
+            return fail(message=_extract_error(e))
+
+    def partial_update(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            topik = self.get_object()
+            topik.delete()
+            return ok(message="Topik berhasil dihapus.")
         except Exception as e:
             return fail(message=_extract_error(e))
 

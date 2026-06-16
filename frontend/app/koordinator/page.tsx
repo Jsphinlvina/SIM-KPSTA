@@ -7,6 +7,7 @@ import {
   Award,
   Users,
   FileText,
+  BookOpen,
   Bell,
   LogOut,
 } from "lucide-react";
@@ -145,7 +146,7 @@ export default function DashboardKoordinatorLanding() {
         )}
 
         {/* Cards */}
-        <div className="flex items-center justify-center gap-10">
+        <div className="flex items-center justify-center flex-wrap gap-10">
           {/* PENENTUAN PEMBIMBING */}
           <Link href="/koordinator/penentuan-pembimbing">
             <div
@@ -295,6 +296,49 @@ export default function DashboardKoordinatorLanding() {
                 <p className="text-gray-500 mt-3 text-lg">
                   Statistik & kelulusan
                 </p>
+              </div>
+            </div>
+          </Link>
+
+          {/* KELOLA TOPIK */}
+          <Link href="/koordinator/topik">
+            <div
+              className="
+                w-72
+                h-72
+                rounded-3xl
+                bg-white
+                border
+                border-[#dbe9f4]
+                shadow-sm
+                hover:shadow-xl
+                hover:-translate-y-2
+                transition
+                flex
+                flex-col
+                items-center
+                justify-center
+                gap-8
+                cursor-pointer
+              "
+            >
+              <div
+                className="
+                  w-28
+                  h-28
+                  rounded-3xl
+                  bg-[#EAF4FB]
+                  flex
+                  items-center
+                  justify-center
+                  text-[#355872]
+                "
+              >
+                <BookOpen size={48} />
+              </div>
+              <div className="text-center">
+                <h2 className="text-4xl font-bold text-[#355872]">Topik</h2>
+                <p className="text-gray-500 mt-3 text-lg">Kelola topik KP</p>
               </div>
             </div>
           </Link>

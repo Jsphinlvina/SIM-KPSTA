@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus, Pencil, Trash2, Loader2, CheckCircle2, AlertCircle, X } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Loader2, CheckCircle2, AlertCircle, X, Clock } from "lucide-react";
 import api from "../../api";
 
 interface Defense {
@@ -70,6 +70,11 @@ export default function JadwalSidangPage() {
   const [actionId, setActionId] = useState<number | null>(null);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
 
+  const [slots, setSlots] = useState<{ start: string; end: string }[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [availability, setAvailability] = useState<boolean | null>(null);
+  const [checkingTime, setCheckingTime] = useState(false);
+
   const showToast = (msg: string, ok: boolean) => {
     setToast({ msg, ok });
     setTimeout(() => setToast(null), 3000);
@@ -96,13 +101,52 @@ export default function JadwalSidangPage() {
     init();
   }, []);
 
+  // Fetch open slots when lecturer + date are both set in the modal
+  useEffect(() => {
+    if (!showModal || !form.lecturer_id || !form.date) {
+      setSlots([]);
+      setAvailability(null);
+      return;
+    }
+    setSlotsLoading(true);
+    setSlots([]);
+    setAvailability(null);
+    api
+      .get(`/availability/slots/?lecturer_id=${form.lecturer_id}&date=${form.date}`)
+      .then((res) => setSlots(res.data.data?.slots ?? []))
+      .catch(() => setSlots([]))
+      .finally(() => setSlotsLoading(false));
+  }, [showModal, form.lecturer_id, form.date]);
+
+  // Debounced availability check for the chosen time
+  useEffect(() => {
+    if (!showModal || !form.lecturer_id || !form.date || !form.time) {
+      setAvailability(null);
+      return;
+    }
+    setAvailability(null);
+    setCheckingTime(true);
+    const timer = setTimeout(() => {
+      api
+        .get(`/availability/check/?lecturer_id=${form.lecturer_id}&date=${form.date}&time=${form.time}`)
+        .then((res) => setAvailability(res.data.data?.available ?? null))
+        .catch(() => setAvailability(null))
+        .finally(() => setCheckingTime(false));
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [form.time, showModal, form.lecturer_id, form.date]);
+
   const openCreate = () => {
     setEditId(null);
     setForm({ ...EMPTY_FORM, coordinator_id: String(koordinatorId ?? "") });
+    setSlots([]);
+    setAvailability(null);
     setShowModal(true);
   };
 
   const openEdit = (d: Defense) => {
+    setSlots([]);
+    setAvailability(null);
     setEditId(d.id);
     setForm({
       bimbingan_aktif_id: String(d.bimbingan_aktif_id),
@@ -129,6 +173,10 @@ export default function JadwalSidangPage() {
   };
 
   const handleSave = async () => {
+    if (availability === false) {
+      showToast("Dosen tidak tersedia pada waktu ini. Pilih slot yang tersedia.", false);
+      return;
+    }
     setSaving(true);
     const payload = {
       bimbingan_aktif_id: Number(form.bimbingan_aktif_id),
@@ -302,14 +350,63 @@ export default function JadwalSidangPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-[#355872] mb-1">Jam</label>
-                  <input
-                    type="time"
-                    value={form.time}
-                    onChange={(e) => setForm((p) => ({ ...p, time: e.target.value }))}
-                    className="w-full h-11 rounded-xl border border-[#9CD5FF] px-4 outline-none focus:ring-2 focus:ring-[#7AAACE]"
-                  />
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="time"
+                      value={form.time}
+                      onChange={(e) => setForm((p) => ({ ...p, time: e.target.value }))}
+                      className="flex-1 h-11 rounded-xl border border-[#9CD5FF] px-4 outline-none focus:ring-2 focus:ring-[#7AAACE]"
+                    />
+                    {checkingTime ? (
+                      <Loader2 size={14} className="animate-spin text-gray-400 shrink-0" />
+                    ) : availability === true ? (
+                      <CheckCircle2 size={16} className="text-green-500 shrink-0" />
+                    ) : availability === false ? (
+                      <AlertCircle size={16} className="text-red-500 shrink-0" />
+                    ) : null}
+                  </div>
                 </div>
               </div>
+
+              {/* Available slots hint */}
+              {form.lecturer_id && form.date && (
+                <div>
+                  <p className="text-xs font-semibold text-[#355872] mb-1.5 flex items-center gap-1">
+                    <Clock size={12} /> Slot Tersedia Dosen (09:00–15:00)
+                  </p>
+                  {slotsLoading ? (
+                    <div className="flex gap-2">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-7 w-16 rounded-lg bg-gray-100 animate-pulse" />
+                      ))}
+                    </div>
+                  ) : slots.length === 0 ? (
+                    <p className="text-xs text-red-500">Tidak ada slot tersedia pada hari ini.</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {slots.map((s) => (
+                        <button
+                          key={s.start}
+                          type="button"
+                          onClick={() => setForm((p) => ({ ...p, time: s.start }))}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer ${
+                            form.time === s.start
+                              ? "bg-[#355872] text-white border-[#355872]"
+                              : "bg-white text-[#355872] border-[#9CD5FF] hover:bg-[#EAF4FB]"
+                          }`}
+                        >
+                          {s.start}–{s.end}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {availability === false && form.time && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Waktu ini bentrok dengan jadwal lain dosen.
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-semibold text-[#355872] mb-1">Lokasi</label>
@@ -353,7 +450,7 @@ export default function JadwalSidangPage() {
               </button>
               <button
                 onClick={handleSave}
-                disabled={saving || !form.bimbingan_aktif_id || !form.date || !form.time}
+                disabled={saving || !form.bimbingan_aktif_id || !form.date || !form.time || availability === false || checkingTime}
                 className="px-5 py-2 rounded-xl bg-[#355872] hover:bg-[#7AAACE] text-white transition disabled:opacity-60 flex items-center gap-2"
               >
                 {saving && <Loader2 size={16} className="animate-spin" />}

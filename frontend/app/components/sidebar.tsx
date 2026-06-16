@@ -99,7 +99,8 @@ function SidebarContent({ role }: { role: SidebarRole }) {
       pathname === "/koordinator/laporan" ||
       pathname === "/koordinator/kelayakan-pembimbing" ||
       pathname === "/koordinator/arsip" ||
-      pathname === "/koordinator/jadwal-sidang"
+      pathname === "/koordinator/jadwal-sidang" ||
+      pathname === "/koordinator/topik"
     : isAdmin
     ? pathname === "/admin/user" ||
       pathname === "/admin/periode-semester"
@@ -224,6 +225,11 @@ function SidebarContent({ role }: { role: SidebarRole }) {
                     href="/koordinator/jadwal-sidang"
                     label="Jadwal Sidang"
                     active={pathname === "/koordinator/jadwal-sidang"}
+                  />
+                  <SidebarSubLink
+                    href="/koordinator/topik"
+                    label="Kelola Topik"
+                    active={pathname === "/koordinator/topik"}
                   />
                 </>
               ) : isAdmin ? (

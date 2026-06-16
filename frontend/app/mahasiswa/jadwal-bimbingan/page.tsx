@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import "react-calendar/dist/Calendar.css";
 import Link from "next/link";
-import { ArrowLeft, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2, AlertCircle, Clock } from "lucide-react";
 import api from "../../api";
 
 const Calendar = dynamic(() => import("react-calendar"), { ssr: false });
@@ -18,6 +18,11 @@ interface GuidanceEvent {
   time: string;
   status: string;
   notes: string;
+}
+
+interface Slot {
+  start: string;
+  end: string;
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -47,9 +52,20 @@ export default function JadwalBimbinganPage() {
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
 
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [availability, setAvailability] = useState<boolean | null>(null);
+  const [checkingTime, setCheckingTime] = useState(false);
+
   const showToast = (msg: string, ok: boolean) => {
     setToast({ msg, ok });
     setTimeout(() => setToast(null), 3000);
+  };
+
+  const getSelectedDate = (): string | null => {
+    if (date instanceof Date) return date.toISOString().split("T")[0];
+    if (Array.isArray(date) && date[0]) return (date[0] as Date).toISOString().split("T")[0];
+    return null;
   };
 
   useEffect(() => {
@@ -88,19 +104,54 @@ export default function JadwalBimbinganPage() {
     init();
   }, []);
 
+  // Fetch open slots when modal opens for a given date
+  useEffect(() => {
+    if (!openModal || !lecturerId) return;
+    const selectedDate = getSelectedDate();
+    if (!selectedDate) return;
+
+    setSlotsLoading(true);
+    setSlots([]);
+    setAvailability(null);
+    api
+      .get(`/availability/slots/?lecturer_id=${lecturerId}&date=${selectedDate}`)
+      .then((res) => setSlots(res.data.data?.slots ?? []))
+      .catch(() => setSlots([]))
+      .finally(() => setSlotsLoading(false));
+  }, [openModal, lecturerId, date]);
+
+  // Debounced availability check for the chosen time
+  useEffect(() => {
+    if (!openModal || !lecturerId || !time) return;
+    const selectedDate = getSelectedDate();
+    if (!selectedDate) return;
+
+    setAvailability(null);
+    setCheckingTime(true);
+    const timer = setTimeout(() => {
+      api
+        .get(`/availability/check/?lecturer_id=${lecturerId}&date=${selectedDate}&time=${time}`)
+        .then((res) => setAvailability(res.data.data?.available ?? null))
+        .catch(() => setAvailability(null))
+        .finally(() => setCheckingTime(false));
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [time, openModal, lecturerId, date]);
+
   const handleDateClick = (value: Value) => {
     setDate(value);
+    setTime("09:00");
     setOpenModal(true);
   };
 
   const handleSubmit = async () => {
     if (!bimbinganId || !lecturerId) return;
-    const selectedDate =
-      date instanceof Date
-        ? date.toISOString().split("T")[0]
-        : Array.isArray(date) && date[0]
-        ? (date[0] as Date).toISOString().split("T")[0]
-        : null;
+    if (availability === false) {
+      showToast("Dosen tidak tersedia pada waktu ini. Pilih slot yang tersedia.", false);
+      return;
+    }
+
+    const selectedDate = getSelectedDate();
     if (!selectedDate) return;
 
     setSubmitting(true);
@@ -133,7 +184,6 @@ export default function JadwalBimbinganPage() {
 
   return (
     <div className="p-10 flex flex-col w-full">
-      {/* Header */}
       <div className="flex items-start justify-between mb-10">
         <div className="flex items-start gap-4">
           <Link
@@ -164,7 +214,6 @@ export default function JadwalBimbinganPage() {
       ) : (
         <div className="bg-white rounded-3xl shadow-sm border border-[#e6eef5] p-8">
           <div className="grid grid-cols-3 gap-8">
-            {/* Calendar */}
             <div className="col-span-2">
               <Calendar
                 onChange={handleDateClick}
@@ -173,7 +222,6 @@ export default function JadwalBimbinganPage() {
               />
             </div>
 
-            {/* Riwayat */}
             <div className="bg-[#EAF4FB] rounded-2xl border border-[#e6eef5] p-6 h-fit">
               <h2 className="text-xl font-bold text-[#355872] mb-6">Riwayat Bimbingan</h2>
               {history.length === 0 ? (
@@ -214,13 +262,13 @@ export default function JadwalBimbinganPage() {
         </div>
       )}
 
-      {/* Modal */}
+      {/* Booking Modal */}
       {openModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
             <h2 className="text-xl font-bold text-[#355872] mb-4">Pengajuan Bimbingan</h2>
 
-            <div className="bg-[#EAF4FB] text-[#355872] rounded-2xl px-5 py-4 font-semibold mb-6">
+            <div className="bg-[#EAF4FB] text-[#355872] rounded-2xl px-5 py-4 font-semibold mb-5">
               {date instanceof Date
                 ? date.toLocaleDateString("id-ID", {
                     day: "numeric",
@@ -230,18 +278,74 @@ export default function JadwalBimbinganPage() {
                 : ""}
             </div>
 
+            {/* Available slots */}
+            <div className="mb-5">
+              <p className="text-xs font-semibold text-[#355872] mb-2 flex items-center gap-1.5">
+                <Clock size={13} />
+                Slot Tersedia (09:00 – 15:00)
+              </p>
+              {slotsLoading ? (
+                <div className="flex gap-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-8 w-20 rounded-lg bg-gray-100 animate-pulse" />
+                  ))}
+                </div>
+              ) : slots.length === 0 ? (
+                <p className="text-xs text-red-500 bg-red-50 rounded-xl px-3 py-2">
+                  Tidak ada slot tersedia pada hari ini.
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {slots.map((s) => (
+                    <button
+                      key={s.start}
+                      onClick={() => setTime(s.start)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer ${
+                        time === s.start
+                          ? "bg-[#355872] text-white border-[#355872]"
+                          : "bg-white text-[#355872] border-[#9CD5FF] hover:bg-[#EAF4FB]"
+                      }`}
+                    >
+                      {s.start}–{s.end}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Time input with availability badge */}
             <div className="mb-4">
               <label className="block text-sm font-semibold text-[#355872] mb-1">Jam</label>
-              <input
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="w-full h-11 rounded-xl border border-[#9CD5FF] px-4 outline-none focus:ring-2 focus:ring-[#7AAACE]"
-              />
+              <div className="flex items-center gap-3">
+                <input
+                  type="time"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className="flex-1 h-11 rounded-xl border border-[#9CD5FF] px-4 outline-none focus:ring-2 focus:ring-[#7AAACE]"
+                />
+                {checkingTime ? (
+                  <Loader2 size={16} className="animate-spin text-gray-400 shrink-0" />
+                ) : availability === true ? (
+                  <span className="flex items-center gap-1 text-xs font-semibold text-green-600 shrink-0">
+                    <CheckCircle2 size={15} /> Tersedia
+                  </span>
+                ) : availability === false ? (
+                  <span className="flex items-center gap-1 text-xs font-semibold text-red-500 shrink-0">
+                    <AlertCircle size={15} /> Bentrok
+                  </span>
+                ) : null}
+              </div>
+              {availability === false && (
+                <p className="text-xs text-red-500 mt-1.5">
+                  Dosen sudah ada jadwal lain. Pilih slot di atas atau ganti waktu.
+                </p>
+              )}
             </div>
 
             <div className="mb-8">
-              <label className="block text-sm font-semibold text-[#355872] mb-1">Catatan (opsional)</label>
+              <label className="block text-sm font-semibold text-[#355872] mb-1">
+                Catatan (opsional)
+              </label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -253,14 +357,18 @@ export default function JadwalBimbinganPage() {
 
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => { setOpenModal(false); setNotes(""); setTime("09:00"); }}
+                onClick={() => {
+                  setOpenModal(false);
+                  setNotes("");
+                  setTime("09:00");
+                }}
                 className="px-5 py-2 rounded-xl border border-[#dbe9f4] text-gray-600 hover:bg-gray-100 transition"
               >
                 Batal
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={submitting}
+                disabled={submitting || availability === false || checkingTime}
                 className="px-5 py-2 rounded-xl bg-[#355872] hover:bg-[#7AAACE] text-white transition disabled:opacity-60 flex items-center gap-2"
               >
                 {submitting && <Loader2 size={16} className="animate-spin" />}
@@ -271,7 +379,6 @@ export default function JadwalBimbinganPage() {
         </div>
       )}
 
-      {/* Toast */}
       {toast && (
         <div className="fixed left-1/2 -translate-x-1/2 bottom-10 z-50">
           <div
