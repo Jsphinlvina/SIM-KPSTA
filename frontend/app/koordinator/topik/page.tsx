@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Sidebar from "@/app/components/sidebar";
 import { Plus, Trash2, BookOpen, AlertCircle, Edit, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import api from "@/app/api";
@@ -172,8 +171,6 @@ export default function KoordinatorTopikPage() {
 
   return (
     <div className="flex min-h-screen bg-[#F7F8F0]">
-      <Sidebar />
-
       <div className="flex-1 p-10 flex flex-col">
         {/* Header */}
         <div className="flex items-start gap-4 mb-10">

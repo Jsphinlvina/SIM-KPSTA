@@ -5,33 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="80a46f7c-9c13-4b82-bfde-0603117eff68" name="Changes" comment="Update login">
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/apps.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/chain/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/chain/approval_handler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/chain/dosen_pembimbing_handler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/chain/ketua_prodi_handler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/chain/koordinator_kp_handler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/state/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/state/disetujui_state.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/state/ditolak_state.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/state/menunggu_state.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/patterns/state/penentuan_state.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/serializers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/services/bimbingan_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/bimbingan/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/pengajuan/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/pengajuan/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/topik/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/topik/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/config/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/config/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/config/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/dosen/approval/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/dosen/approval/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/dosen/penawaran-topik/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/dosen/penawaran-topik/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/mahasiswa/list-topik/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/mahasiswa/list-topik/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/admin/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/admin/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/dosen/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/dosen/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/koordinator/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/koordinator/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/mahasiswa/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/mahasiswa/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,6 +44,10 @@
     &quot;accountId&quot;: &quot;de0f0a84-ec1a-4dcc-83b1-2f07db5a6ace&quot;
   }
 }</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -73,30 +56,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Week-4-2272029-Josephine-Alvina-Luwia&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Kuliah/SIM-KPSTA&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;background.image.plus&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;D:\\Kuliah\\SIM-KPSTA\\frontend\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "Week-5-2272029-Josephine-Alvina-Luwia",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.preferred.runtime.type.id": "node",
+    "last_opened_file_path": "D:/Kuliah/SIM-KPSTA",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "background.image.plus",
+    "show.migrate.to.gradle.popup": "false",
+    "ts.external.directory.path": "D:\\Kuliah\\SIM-KPSTA\\frontend\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Kuliah\SIM-KPSTA\backend" />
