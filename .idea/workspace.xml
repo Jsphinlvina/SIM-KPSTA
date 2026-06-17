@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="80a46f7c-9c13-4b82-bfde-0603117eff68" name="Changes" comment="Update login">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/admin/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/admin/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/dosen/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/dosen/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/koordinator/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/koordinator/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/mahasiswa/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/mahasiswa/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Week-2-2272029-Josephine-Alvina-Luwia" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Jsphinlvina&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Jsphinlvina/SIM-KPSTA.git&quot;,
+    &quot;accountId&quot;: &quot;de0f0a84-ec1a-4dcc-83b1-2f07db5a6ace&quot;
+  }
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="3Dofgd3ZqGacjVl3zlbUEGhWZyU" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "Week-5-2272029-Josephine-Alvina-Luwia",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.preferred.runtime.type.id": "node",
+    "last_opened_file_path": "D:/Kuliah/SIM-KPSTA",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "background.image.plus",
+    "show.migrate.to.gradle.popup": "false",
+    "ts.external.directory.path": "D:\\Kuliah\\SIM-KPSTA\\frontend\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Kuliah\SIM-KPSTA\backend" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Kuliah\SIM-KPSTA\backend\apps\pengajuan\patterns\factory" />
+      <recent name="D:\Kuliah\SIM-KPSTA\backend\apps" />
+      <recent name="D:\Kuliah\SIM-KPSTA\backend\apps\authentication" />
+      <recent name="D:\Kuliah\SIM-KPSTA\backend" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-PY-252.28238.29" />
+        <option value="bundled-python-sdk-a101402ee41c-968fe969f28a-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.28238.29" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="80a46f7c-9c13-4b82-bfde-0603117eff68" name="Changes" comment="" />
+      <created>1778953459055</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1778953459055</updated>
+      <workItem from="1778953463453" duration="29108000" />
+      <workItem from="1779270540839" duration="2610000" />
+      <workItem from="1779290845498" duration="5057000" />
+      <workItem from="1779331548024" duration="11466000" />
+      <workItem from="1779370296963" duration="9650000" />
+      <workItem from="1779387571821" duration="174000" />
+      <workItem from="1779408120902" duration="2079000" />
+      <workItem from="1779546493997" duration="268000" />
+      <workItem from="1779636746423" duration="1848000" />
+      <workItem from="1779982012933" duration="1316000" />
+      <workItem from="1779992597282" duration="884000" />
+    </task>
+    <task id="LOCAL-00001" summary="Fitur 1 (Autentikasi &amp; Hak Akses)">
+      <option name="closed" value="true" />
+      <created>1779040599050</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1779040599050</updated>
+    </task>
+    <task id="LOCAL-00002" summary="update READ.md">
+      <option name="closed" value="true" />
+      <created>1779041428319</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1779041428319</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Fitur 1 : Login">
+      <option name="closed" value="true" />
+      <created>1779044631134</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1779044631134</updated>
+    </task>
+    <task id="LOCAL-00004" summary="update READ.md">
+      <option name="closed" value="true" />
+      <created>1779045229484</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1779045229484</updated>
+    </task>
+    <task id="LOCAL-00005" summary="update READ.md">
+      <option name="closed" value="true" />
+      <created>1779272389322</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1779272389322</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fitur 1 (Autentikasi &amp; Hak Akses)" />
+    <MESSAGE value="Fitur 1 : Login" />
+    <MESSAGE value="update READ.md" />
+    <MESSAGE value="Update login" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update login" />
+  </component>
+</project>
