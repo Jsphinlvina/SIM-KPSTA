@@ -168,9 +168,13 @@ export default function JadwalSidangPage() {
       ...prev,
       bimbingan_aktif_id: bimId,
       student_id: bim ? String(bim.mahasiswa_detail?.user_id ?? "") : "",
-      lecturer_id: bim ? String(bim.dosen_detail?.user_id ?? "") : "",
+      lecturer_id: "",   // penguji dipilih terpisah, bukan otomatis dari pembimbing
     }));
   };
+
+  const selectedBimbingan = bimbinganList.find(
+    (b) => String(b.bimbingan_id) === form.bimbingan_aktif_id
+  );
 
   const handleSave = async () => {
     if (availability === false) {
@@ -253,7 +257,7 @@ export default function JadwalSidangPage() {
               <div>No</div>
               <div>Tanggal & Tempat</div>
               <div>Mahasiswa</div>
-              <div>Dosen</div>
+              <div>Dosen Penguji</div>
               <div>Status</div>
               <div>Aksi</div>
             </div>
@@ -262,6 +266,7 @@ export default function JadwalSidangPage() {
             ) : (
               defenses.map((d, idx) => {
                 const bim = bimbinganList.find((b) => b.bimbingan_id === d.bimbingan_aktif_id);
+                const penguji = dosenList.find((ds) => ds.user_id === d.lecturer_id);
                 return (
                   <div
                     key={d.id}
@@ -278,7 +283,7 @@ export default function JadwalSidangPage() {
                       {bim?.mahasiswa_detail?.nama_lengkap ?? `ID: ${d.student_id}`}
                     </div>
                     <div className="text-sm text-gray-700">
-                      {bim?.dosen_detail?.nama_lengkap ?? `ID: ${d.lecturer_id}`}
+                      {penguji?.nama_lengkap ?? `ID: ${d.lecturer_id}`}
                     </div>
                     <div>
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_CLASS[d.status] ?? "bg-gray-100 text-gray-600"}`}>
@@ -323,16 +328,42 @@ export default function JadwalSidangPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-[#355872] mb-1">Bimbingan</label>
+                <label className="block text-sm font-semibold text-[#355872] mb-1">Mahasiswa</label>
                 <select
                   value={form.bimbingan_aktif_id}
                   onChange={(e) => handleBimbinganChange(e.target.value)}
                   className="w-full h-11 rounded-xl border border-[#9CD5FF] px-4 outline-none focus:ring-2 focus:ring-[#7AAACE] bg-white text-sm"
                 >
-                  <option value="">— Pilih Bimbingan —</option>
+                  <option value="">— Pilih Mahasiswa —</option>
                   {bimbinganList.map((b) => (
                     <option key={b.bimbingan_id} value={b.bimbingan_id}>
-                      {b.mahasiswa_detail?.nama_lengkap ?? `Bimbingan #${b.id}`}
+                      {b.mahasiswa_detail?.nama_lengkap ?? `Bimbingan #${b.bimbingan_id}`}
+                      {b.mahasiswa_detail?.nim_nip ? ` (${b.mahasiswa_detail.nim_nip})` : ""}
+                    </option>
+                  ))}
+                </select>
+                {selectedBimbingan && (
+                  <p className="text-xs text-gray-500 mt-1.5 px-1">
+                    Dosen Pembimbing:{" "}
+                    <span className="font-semibold text-[#355872]">
+                      {selectedBimbingan.dosen_detail?.nama_lengkap ?? "—"}
+                    </span>
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#355872] mb-1">Dosen Penguji</label>
+                <select
+                  value={form.lecturer_id}
+                  onChange={(e) => setForm((p) => ({ ...p, lecturer_id: e.target.value }))}
+                  className="w-full h-11 rounded-xl border border-[#9CD5FF] px-4 outline-none focus:ring-2 focus:ring-[#7AAACE] bg-white text-sm"
+                >
+                  <option value="">— Pilih Dosen Penguji —</option>
+                  {dosenList.map((d) => (
+                    <option key={d.user_id} value={d.user_id}>
+                      {d.nama_lengkap}
+                      {d.nim_nip ? ` (${d.nim_nip})` : ""}
                     </option>
                   ))}
                 </select>
@@ -450,7 +481,7 @@ export default function JadwalSidangPage() {
               </button>
               <button
                 onClick={handleSave}
-                disabled={saving || !form.bimbingan_aktif_id || !form.date || !form.time || availability === false || checkingTime}
+                disabled={saving || !form.bimbingan_aktif_id || !form.lecturer_id || !form.date || !form.time || availability === false || checkingTime}
                 className="px-5 py-2 rounded-xl bg-[#355872] hover:bg-[#7AAACE] text-white transition disabled:opacity-60 flex items-center gap-2"
               >
                 {saving && <Loader2 size={16} className="animate-spin" />}
